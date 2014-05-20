@@ -1,0 +1,375 @@
+
+
+<<>>=
+f.sample.labeller <- function(variable=NULL, value=NULL) {
+    sample.plot.labels <- c( PLUSS = 'VNP++', ALL = 'Stem',
+	DIFF = 'Diff', GFP = 'VNP+', NEG = 'VNP-')
+    return(unname(sample.plot.labels[as.character(value)]))
+}
+@
+
+<<>>=
+f.meltrumcounts <- function( dframe) {
+    dframe <- as.data.frame( dframe )
+    dframe$GeneSymbol <- row.names( dframe )
+    dframe <- rename( dframe, c(
+	A1 = 'ALL.A', A2 = 'GFP.A', A3 = 'PLUSS.A', A4 = 'NEG.A', A5 = 'DIFF.A',
+	C1 = 'ALL.C', C2 = 'GFP.C', C3 = 'PLUSS.C', C4 = 'NEG.C', C5 = 'DIFF.C'))
+    dframe <- melt( dframe, id = c('GeneSymbol'))
+    dframe$meta <- dframe$variable
+    return( dframe )
+}
+@
+
+\section{Functions to calculate coherence tables}
+
+<<>>=
+library(xtable)
+f.addpadj <- function(x){
+    outdf <- dcast(subset(x,variable %in% c('pval','padj')), '...~variable')
+    outdf <- ddply(outdf, c('source','meta'), transform, padj=p.adjust(pval,method='BH'))
+    outdf <- melt(outdf, c('source','meta','GeneSymbol'))
+    return( rbind( subset(x, variable != 'padj'), subset(outdf, variable == 'padj')))
+}
+f.addsignedsig <- function(x, fdr=0.1) {
+    outdf <- dcast(subset(x, variable %in% c('padj','log2Fold')), '...~variable')
+    outdf <- transform( outdf, signedsig = sign(log2Fold)*(padj < fdr))
+    outdf <- melt(outdf, c('source','meta','GeneSymbol'))
+    return( rbind( subset(x, variable != 'signedsig'), subset(outdf, variable == 'signedsig')))
+}
+f.sigtable <- function(x, metastocompare){
+    # input data frame with signedsignificance values in 'metastocompare' columns
+    outdf <- abs(x[,metastocompare])
+    return( as.data.frame( table(outdf)))
+}
+f.coherencecalc <- function( x ){
+    # x is coercable to a matrix that contains -1, 1,  or other values.
+    x <- as.matrix(x)
+    Ncoh <- sum( apply(x, MARGIN = 1, function(row) all( row == 1)|all(row==-1) ), na.rm=TRUE)
+    Nall <- sum( apply(x, MARGIN = 1, function(row) all( abs(row) == 1)), na.rm = TRUE)
+    return( Ncoh / Nall )
+}
+f.coherencetable <- function(x, metastocompare) {
+    # input data frame with signedsignificance values in 'metastocompare' columns
+    sigdf <- as.matrix( abs(x[,metastocompare])) > 0
+    # Keep rows with all significant
+    outdf <- x[ apply(sigdf,MARGIN=1,all), metastocompare]
+    return( as.data.frame(table(outdf)))
+}
+f.prettycohtable <- function(x, metastocompare) {
+    cohtable <- f.coherencetable(x, metastocompare)
+    captext <- paste0('Coherence = ', format( f.coherencecalc(x[,metastocompare]),digits=3))
+    print( xtable( cohtable, caption = captext),floating=FALSE)
+    print(noquote(c('\\',captext,'\\')))
+}
+@
+
+\section{ Functios to run GOSeq }
+
+<<>>=
+require(goseq)
+f.rungoseq <- function( geneids, member.of.subset, dataforbias, 
+	gene2cat, test.cats='GO:BP', method = 'Wallenius'){
+    DEgenes <- as.vector(member.of.subset)
+    names(DEgenes) <- geneids
+    bias.data <- as.vector(dataforbias)
+    names(bias.data) <- geneids
+    pwf <- nullp(DEgenes = DEgenes, genome = 'mm9', 
+	id = 'geneSymbol', bias.data=bias.data)
+    GOdat <- goseq(pwf, genome = 'mm9', id = 'geneSymbol',
+	gene2cat = gene2cat, test.cats = 'GO:BP', method = method)
+    GOdat$GOTERM <- Term(GOdat$category)
+    return(GOdat)
+}
+@
+
+\section{ Functions to run a very basic GO analysis - greedy}
+
+<<>>=
+f.GOsizefilter <- function( gotable, gosizecutoff, keepsmaller = TRUE ){
+    gotable <- as.data.table(gotable)
+    gofreqs <- gotable[,list(Num=length(GeneSymbol)),by='Category'] 
+    if (keepsmaller){ 
+	smallgos <- subset( gofreqs, gofreqs$Num < gosizecutoff, select = 'Category')
+    } else {
+	smallgos <- subset( gofreqs, gofreqs$Num > gosizecutoff, select = 'Category')
+    }
+    subset(gotable, gotable$Category %in% smallgos$Category)
+}
+f.orderbymaxcover <- function( Num, Num.univ, Num.hits ) {
+    # Sort first by high number of hit genes that haven't been assigned yet, 
+    # then by low number of members in Universe
+    # Lastly by number of hits
+    order( Num, -Num.univ, Num.hits, decreasing = TRUE )
+}
+f.orderbyhighconc <- function( Num, Num.univ, Num.hits ) {
+    # Sort first by high concentration of hit genes not yet assigned. 
+    # Then by size of the category (prefer larger categories of same concentration)
+    # Lastly by number of hits
+    order( Num/Num.univ, Num.univ, Num.hits, decreasing = TRUE)
+}
+f.greedyGO <- function( gotable, genehits, goorderFUN, gonumcutoff=20){
+    # Calculate hit fraction expected from a random GO-annotated gene subset
+    Num.overall.univ <- length( unique(gotable$GeneSymbol ) )
+    Num.hits.univ <- sum( unique(genehits) %in% gotable$GeneSymbol )
+    frac.hits.rndm <- Num.hits.univ / Num.overall.univ
+    
+    mygotable <- as.data.table(gotable)
+    gofreqs <- mygotable[, list(Num.univ=length(GeneSymbol)), by='Category']
+    mygotable <- subset(mygotable, mygotable$GeneSymbol %in% genehits)
+    hitfreqs <- mygotable[,list(Num.hits=length(GeneSymbol)),by='Category']
+    gofreqs <- merge(gofreqs, hitfreqs, by='Category', all.x=FALSE, all.y=TRUE)
+    outgo <- data.frame()
+    doneflag <- FALSE
+    while (!doneflag){
+	freqs <- mygotable[,list(Num=length(GeneSymbol)),by='Category']
+	freqs <- merge( gofreqs, freqs, by='Category', all.x=FALSE, all.y=TRUE)
+	freqs <- freqs[ with(freqs, 
+	    goorderFUN(Num=Num, Num.univ=Num.univ, Num.hits=Num.hits)), ]
+	outgo <- rbind( outgo, freqs[1,])
+	genes.in.cat <- subset(mygotable, mygotable$Category == freqs$Category[1], 
+	    select='GeneSymbol',drop=TRUE)
+	mygotable <- subset(mygotable, 
+	    !(mygotable$GeneSymbol %in% genes.in.cat$GeneSymbol))
+	if (nrow(mygotable) == 0) doneflag <- TRUE
+	if (!is.null(gonumcutoff)){
+	    if (nrow(outgo) == gonumcutoff ) doneflag <- TRUE
+	}
+    }
+    outgo <- cbind(TERM=Term(as.character(outgo$Category)),outgo)
+    outgo <- outgo[,c('TERM','Num','Num.hits','Num.univ','Category')]
+    outgo$Num.hits.rndm <- frac.hits.rndm * outgo$Num.univ
+    return( outgo )
+}
+f.abbreviate <- function( string, charlimit ){
+    string <- ifelse( nchar(string) < charlimit, string, 
+	str_replace_all( string, '\\B[aeiou]{1,}', ''))
+    string <- ifelse( nchar(string) < charlimit, string,
+	str_replace_all( string, '([[:alpha:]]{4})[[:alpha:]]{1,}', '\\1\\.'))
+    string <- ifelse( nchar(string) < charlimit, string,
+	paste0( str_sub(string, 1, charlimit-3), '...'))
+    return(string)
+}
+f.projectGO <- function( gotable, genehits, categories, allowoverlap = FALSE ) {
+    gotable <- subset(gotable, gotable$GeneSymbol %in% genehits )
+    if (allowoverlap) return( subset( gotable, gotable$Category %in% categories ) )
+    
+    goout <- data.frame()
+    for (ctgry in categories) {
+	rows.in.ctgry <- subset( gotable, gotable$Category == ctgry )
+	goout <- rbind( goout, rows.in.ctgry )
+	gotable <- subset( gotable, !(gotable$GeneSymbol %in% rows.in.ctgry$GeneSymbol))
+    }
+    return(goout)
+}
+@
+
+<<>>=
+f.golist.to.godf <- function(goannot){ 
+    gonames <- unlist(goannot,use.names=FALSE)
+    genenames <- ldply(goannot, length)
+    genenames <- rep( genenames[['.id']], genenames[['V1']])
+    goannotlong <- data.frame( GeneSymbol = genenames, Category = gonames)
+    return( data.table(goannotlong) )
+}
+@
+
+<<>>=
+f.GOxdeseq <- function( genehits, fullgotable, melteddeseq, 
+    GOsizecutoff = 1000, gonumcutoff = NULL ) {
+    greedyout <- f.greedyGO( 
+	gotable = f.GOsizefilter(fullgotable, GOsizecutoff, keepsmaller=FALSE), 
+	genehits = genehits,
+	goorderFUN = f.orderbyhighconc,
+	gonumcutoff = gonumcutoff 
+    )
+
+    dat <- dcast(melteddeseq, 'GeneSymbol + meta ~ variable')
+    dat <- subset(dat, issig == 1)
+    dat <- ddply( dat, c('meta','signedsig'), function(x) f.projectGO( 
+	fullgotable, as.character(x$GeneSymbol), greedyout$Category , allowoverlap=FALSE))
+
+    termnames <- f.abbreviate( Term(as.character(greedyout$Category)), 40)
+    greedyout$TERM <- factor(termnames, termnames )
+    dat <- merge(dat, greedyout[,c('Category','TERM')], by='Category', all.x=TRUE, all.y=FALSE) 
+
+
+    dftoplot <- subset( dat, meta %in% c('GFP.NEG','ALL.DIFF'))
+    dftoplot$highin <- with(dftoplot, { 
+	condsinvolved <- matrix( unlist( str_split(meta,'\\.')), nrow = length( meta ), byrow=TRUE) 
+	ifelse( signedsig == -1, condsinvolved[,1], condsinvolved[,2])
+    })
+    dftoplot$highin <- factor( dftoplot$highin, c('GFP','NEG','ALL','DIFF'), labels=c('VNP(+)','VNP(-)','Stem','Diff'))
+    return(dftoplot)
+}
+f.plotHistxdeseq <- function( dftoplot ) {
+    levels( dftoplot$TERM ) <- str_wrap( levels(dftoplot$TERM), 20)
+    q <- ggplot( dftoplot, aes( x=highin, fill=highin )) + geom_bar() + facet_wrap( 'TERM',scales='free_y' )
+    q <- q + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+    q <- q + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+    return(q)
+}
+f.plotFracsxdeseq <- function( dftoplot ) {
+    dat <- ddply(dftoplot, c('highin','Category','TERM'), summarize, 
+	Num=length(GeneSymbol))
+    dat <- ddply(dat, c('highin'), transform, Frac=Num/sum(Num))
+    dat <- subset( dat, TERM !='biological_process')
+    dat$TERM <- factor(dat$TERM, rev( levels(dat$TERM) ))
+    q <- ggplot( dat, aes( y = Num, x = TERM )) + 
+	geom_bar(stat='identity') 
+    q <- q + coord_flip() + facet_grid( . ~ highin ) + guides( fill = FALSE )
+    q <- q + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+    q
+}
+f.plotFracsxdeseq.twoside <- function( dftoplot ) {
+    dat <- ddply(dftoplot, c('meta','signedsig','Category','TERM'), summarize, 
+	Num=length(GeneSymbol))
+    dat <- ddply(dat, c('meta','signedsig'), transform, Frac=Num/sum(Num))
+    dat <- subset( dat, TERM !='biological_process')
+    dat$TERM <- factor(dat$TERM, rev( levels(dat$TERM) ))
+    dat <- transform(dat, Num = Num*signedsig)
+    q <- ggplot( dat, aes( y = Num, x = TERM, fill=factor(signedsig,c(-1,1)) )) + 
+	geom_bar(data=subset(dat,signedsig==1),stat='identity') +
+	geom_bar(data=subset(dat,signedsig==-1), stat='identity')
+    q <- q + coord_flip() + facet_grid( . ~ meta ) + guides( fill = FALSE )
+    q <- q + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+}
+@
+
+<<>>=
+f.makegreedyGOtable <- function( genehits = genehits, gotable = goannotlong, 
+    gosigdata = cats_hits, gosizecutoff = 250 , abbrlength = 40) {
+    GOcats.bygreedy <- f.greedyGO(
+	gotable = f.GOsizefilter( gotable, 
+	    gosizecutoff = gosizecutoff, 
+	    keepsmaller = FALSE ),
+	genehits = genehits, 
+	goorderFUN = f.orderbyhighconc, 
+	gonumcutoff = NULL )
+    if (!is.null(gosigdata)){
+	GOcats.bygreedy$over_represented_pvalue <- 
+	    gosigdata$over_represented_pvalue[
+		match( GOcats.bygreedy$Category, gosigdata$Category ) ]
+    } else {
+	GOcats.bygreedy$over_represented_pvalue <- NA
+    }
+    termnames <- f.abbreviate( Term(as.character(GOcats.bygreedy$Category)), abbrlength)
+    GOcats.bygreedy$TERM <- factor(termnames, termnames )
+    GOcats.bygreedy <- transform( GOcats.bygreedy,
+	Frac.hits.rndm = Num.hits.rndm / Num.univ,
+	Frac.hits = Num.hits / Num.univ,
+	issig = over_represented_pvalue < 0.05 )
+    return(GOcats.bygreedy)
+}
+@
+<<>>=
+f.deseqXgreedyGO <- function( melteddeseq, greedyGOresult, fullgotable ) {
+    dftoplot <- subset(melteddeseq, meta %in% c('GFP.NEG','ALL.DIFF'))
+    dftoplot <- dcast(dftoplot, 'GeneSymbol + meta ~ variable')
+    dftoplot <- subset(dftoplot, issig == 1 )
+    dftoplot <- ddply(dftoplot, c('meta','signedsig'), function(x) f.projectGO(
+	fullgotable, as.character(x$GeneSymbol), 
+	greedyGOresult$Category, allowoverlap=FALSE))
+    dftoplot <- merge(dftoplot, greedyGOresult[,c('Category','TERM')], 
+	by='Category', all.x=TRUE, all.y=FALSE) 
+    dftoplot$highin <- f.getHighIn( dftoplot )
+    dftoplot$highin <- factor( dftoplot$highin, c('GFP','NEG','ALL','DIFF') )
+    return(dftoplot)
+}
+@
+<<>>=
+f.plotgreedygostats <- function( greedyGOtable ) {
+    greedyGOtable$issig <- factor( greedyGOtable$issig, c(FALSE, TRUE ) ) 
+    q <- ggplot( data = subset( greedyGOtable, TERM != 'biological_process'), 
+	aes( x = factor(TERM,rev(levels(TERM) ))) ) 
+    q <- q + geom_point( aes( y = Frac.hits, size = issig ))
+    q <- q + scale_size_manual( values=c(1,2), drop=FALSE)
+    q <- q + geom_hline( yintercept = GOcats.bygreedy$Frac.hits.rndm[1] )
+    q <- q + coord_flip()
+    return(q)
+}
+@
+
+A utility function that determines what condition a row is high in. For example,
+if \verb+meta = GFP.NEG+ and \verb+signedsig = -1+ then \verb+highin = NEG+. 
+
+<<>>=
+f.getHighIn <- function( x ) {
+    condsinvolved <- matrix( unlist( str_split( x$meta, '\\.')),
+    nrow = length( x$meta), byrow = TRUE )
+    highin <- ifelse(x$signedsig == -1, condsinvolved[,1], condsinvolved[,2])
+    return( highin )
+}
+@
+
+
+\section{Gene list}
+
+<<>>=
+f.cross.wGenelist <- function( x, genelist ){
+    m.gl <- melt(genelist)
+    # ensures the order given in gene list will be preserved.
+    m.gl <- transform( m.gl, 
+	value = factor(value, do.call(c, unname(genelist))),
+	L1 = factor(L1, names(genelist)))
+    m.gl <- rename(m.gl, c(value='GeneSymbol'))
+    outdf <- merge( x, m.gl, by='GeneSymbol')
+    outdf$GeneSymbol <- factor(outdf$GeneSymbol, 
+	    levels(m.gl$GeneSymbol))
+    outdf$L1 <- factor(outdf$L1, levels(m.gl$L1))
+    return(outdf)
+}
+f.makehitlist <- function( deseqcompared = 'GFP.NEG', deseqmelted, rpkmmelted){
+    hitlist <- subset( deseqmelted, meta %in% deseqcompared )
+    hitlist <- dcast( hitlist, 'GeneSymbol + meta ~ variable' )
+    hitlist <- subset( hitlist, issig == 1) 
+    rpkmdat <- subset( rpkmmelted, variable == 'rpkm')
+    rpkmdat <- dcast( rpkmdat, 'GeneSymbol ~ meta')
+    hitlist <- merge( hitlist, rpkmdat, by='GeneSymbol', all.x=TRUE, all.y=FALSE)
+    condsinvolved <- str_split( deseqcompared, '\\.')[[1]]
+    hitlist$maxRPKM <- pmax(hitlist[,condsinvolved[1]],hitlist[,condsinvolved[2]])
+    hitlist$minRPKM <- pmin(hitlist[,condsinvolved[1]],hitlist[,condsinvolved[2]]) 
+    hitlist
+}
+f.plot_hitlist_genelist <- function(deseqcompared = 'GFP.NEG',genelist, 
+	deseqmelted, rpkmmelted) {
+    hitlist <- f.makehitlist( deseqcompared, deseqmelted, rpkmmelted)
+    hitspecial <- f.cross.wGenelist( hitlist, genelist)
+    hitlist <- subset( hitlist, ! (GeneSymbol %in% hitspecial$GeneSymbol) )
+    hitlist$L1 <- NA
+    q <- ggplot(hitlist, aes( x=log2(maxRPKM), y=log2Fold, color=L1) ) + geom_point(size=0.5) +
+	geom_point(data=hitspecial,size=2) +
+	geom_text( data = hitspecial, aes(label=GeneSymbol), vjust = 0, color = 'black', size=3) +
+	ylim(-2.5,5) + scale_color_discrete( drop = FALSE) + xlim(-5,10)
+    q + ggtitle(deseqcompared)
+}
+@
+
+
+
+<<>>=
+require(gtools)
+require(grid)
+f.logfold.dotplot <- function(dfin, sort.names = TRUE){
+    sortedgenes <- gtools::mixedsort( unique(dfin$GeneSymbol) )
+    df2 <- dfin
+    if (sort.names) {
+	df2 <- transform( df2, GeneSymbol = 
+	    factor( GeneSymbol, rev(sortedgenes)))
+    }
+    df2 <- transform( df2, issig = factor(issig, levels=c(0,1)))
+    q <- ggplot(df2, aes(log2Fold, GeneSymbol, fill=meta )) +
+	geom_vline(xintercept = 0) + geom_point(shape=21) + 
+	geom_point( data = subset(df2,issig==1), shape= '.', color='red') +
+	scale_fill_manual(values=c('black','white'),guide=FALSE) 
+    q <- q + theme_minimal(base_size=base_size) 
+    q <- q + theme(
+	legend.position='top',
+	strip.background = element_blank(),
+	panel.margin = unit(0.5,'lines')
+    )
+    q <- q + ylab(NULL) + xlab('log2Fold')
+    return(q)
+}
+@
+

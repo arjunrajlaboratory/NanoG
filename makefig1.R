@@ -75,7 +75,7 @@ genelist <- list(
 
 
 
-load('./intermediate_results/m.deseq.RData')
+source('loadMDeseq.R')
 dftoplot <- rbind( m.deseq )
 dftoplot <- subset( dftoplot, variable %in% c('log2Fold','issig') )
 dftoplot <- dcast( dftoplot, 'source+meta+GeneSymbol ~ variable')

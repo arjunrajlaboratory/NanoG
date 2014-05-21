@@ -67,6 +67,13 @@ f.prettycohtable <- function(x, metastocompare) {
 \section{ Functios to run GOSeq }
 
 <<>>=
+f.golist.to.godf <- function(goannot){ 
+    gonames <- unlist(goannot,use.names=FALSE)
+    genenames <- ldply(goannot, length)
+    genenames <- rep( genenames[['.id']], genenames[['V1']])
+    goannotlong <- data.frame( GeneSymbol = genenames, Category = gonames)
+    return( data.table(goannotlong) )
+}
 @
 
 \section{ Functions to run a very basic GO analysis - greedy}

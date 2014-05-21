@@ -88,15 +88,6 @@ invisible(dev.off())
 
 
 
-
-f.golist.to.godf <- function(goannot){ 
-    gonames <- unlist(goannot,use.names=FALSE)
-    genenames <- ldply(goannot, length)
-    genenames <- rep( genenames[['.id']], genenames[['V1']])
-    goannotlong <- data.frame( GeneSymbol = genenames, Category = gonames)
-    return( data.table(goannotlong) )
-}
-
 goannotlong <- f.golist.to.godf( goannot )
 
 

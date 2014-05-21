@@ -3,7 +3,7 @@ VPATH = intermediate_results inputdata outputdata
 
 
 
-allFigures : figure1  figure2  figureCoherence  figurePLUSS
+allFigures : figure1  figure2  figureCoherence  figurePLUSS  figureReconstitution
 
 
 ## make figures
@@ -28,6 +28,12 @@ figureCoherence : makefigCoh.R  m.deseq.RData  goannot.RData
 figurePLUSS : makefigPLUSS.R  m.deseq.RData
 
 	Rscript makefigPLUSS.R
+
+
+figureReconstitution : makefigReconstitute.R \
+ inputdata/FACSreconstitution.csv
+
+	Rscript makefigReconstitute.R
 
 
 ## run GO-related tasks

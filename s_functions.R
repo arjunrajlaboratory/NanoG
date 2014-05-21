@@ -17,32 +17,7 @@ f.plot_counts_alacarte<-function(vectorofgenes, countlist, condlist, ...) {
 
 
 ###################################################
-### code chunk number 2: s_functions.Rnw:22-31
-###################################################
-f.deseq_do_andwrite <- function(countdataset, condpair,
-                                fileprefix ) {
-    message( paste( 'Testing', condpair[1], 'vs', condpair[2]))
-    nbinomresult <- nbinomTest(countdataset, condpair[1], condpair[2])
-    filename <- paste0(fileprefix, condpair[1] , condpair[2])
-    write.table( nbinomresult, file = filename, quote = FALSE, sep = '\t')
-    return( list(condA = condpair[1], condB = condpair[2],
-                 filename = filename))
-}
-
-
-###################################################
-### code chunk number 3: s_functions.Rnw:35-41
-###################################################
-f.deseq_testallpairs <- function(countdataset, fileprefix ) {
-    FUN = function (x)  f.deseq_do_andwrite(countdataset,x,fileprefix)
-    nbinomindex<- apply(X = combn(levels(conditions(countdataset)),m=2),
-                        MARGIN = 2, FUN = FUN)
-    return(nbinomindex)
-}
-
-
-###################################################
-### code chunk number 4: s_functions.Rnw:50-68
+### code chunk number 2: s_functions.Rnw:28-46
 ###################################################
 f.loadntest<-function(condA,condB,nindex){
     ntable<-t(sapply(nindex,
@@ -65,7 +40,7 @@ f.loadntest<-function(condA,condB,nindex){
 
 
 ###################################################
-### code chunk number 5: s_functions.Rnw:76-97
+### code chunk number 3: s_functions.Rnw:54-75
 ###################################################
 nbinomTestSimilarity <- function(cds, condA, condB, maxratiovec = c(2) ){
     colA <- conditions(cds) == condA
@@ -91,7 +66,7 @@ nbinomTestSimilarity <- function(cds, condA, condB, maxratiovec = c(2) ){
 
 
 ###################################################
-### code chunk number 6: s_functions.Rnw:100-135
+### code chunk number 4: s_functions.Rnw:78-113
 ###################################################
 nbinomTestForMatricesSimilarity <- function(countsA, countsB, 
     sizeFactorsA, sizeFactorsB, dispsA, dispsB, ABratio){
@@ -131,7 +106,7 @@ nbinomTestForMatricesSimilarity <- function(countsA, countsB,
 
 
 ###################################################
-### code chunk number 7: s_functions.Rnw:138-151
+### code chunk number 5: s_functions.Rnw:116-129
 ###################################################
 f.loadsimtest <- function(condA,condB,nindex){
     ntable<-t(sapply(nindex,
@@ -149,7 +124,7 @@ f.loadsimtest <- function(condA,condB,nindex){
 
 
 ###################################################
-### code chunk number 8: s_functions.Rnw:159-170
+### code chunk number 6: s_functions.Rnw:137-148
 ###################################################
 f.summarize1v1 <- function( nbindex, countdataset, FUN = NULL){
     lconds <- levels(conditions(cds))
@@ -165,7 +140,7 @@ f.summarize1v1 <- function( nbindex, countdataset, FUN = NULL){
 
 
 ###################################################
-### code chunk number 9: s_functions.Rnw:176-181
+### code chunk number 7: s_functions.Rnw:154-159
 ###################################################
 f.meetsfdr <- function (x, fdr = 0.1) {
     meetsfdr<- x$padj < fdr
@@ -175,7 +150,7 @@ f.meetsfdr <- function (x, fdr = 0.1) {
 
 
 ###################################################
-### code chunk number 10: s_functions.Rnw:185-188
+### code chunk number 8: s_functions.Rnw:163-166
 ###################################################
 f.hitsatfdr <- function (x, fdr = 0.1) {
     sum( f.meetsfdr(x,fdr=fdr))
@@ -183,14 +158,14 @@ f.hitsatfdr <- function (x, fdr = 0.1) {
 
 
 ###################################################
-### code chunk number 11: s_functions.Rnw:192-194
+### code chunk number 9: s_functions.Rnw:170-172
 ###################################################
 f.isexpressed <- function (x) x$baseMean > 0
 f.getlogbaseMean <- function (x) log10(x$baseMean)
 
 
 ###################################################
-### code chunk number 12: s_functions.Rnw:205-222
+### code chunk number 10: s_functions.Rnw:183-200
 ###################################################
 f.plothitstats <- function(condA, condB, nindex, fdr=0.1, regularizelog=0.1,
                            logmeanbreaks="FD", log2foldbreaks="FD") {
@@ -212,7 +187,7 @@ f.plothitstats <- function(condA, condB, nindex, fdr=0.1, regularizelog=0.1,
 
 
 ###################################################
-### code chunk number 13: s_functions.Rnw:227-245
+### code chunk number 11: s_functions.Rnw:205-223
 ###################################################
 f.table_mostextreme <- function (dframe, nshow=10, ...) {
     biggest <- dframe[order(dframe$log2FoldChange,decreasing=TRUE)[1:nshow] ,
@@ -235,7 +210,7 @@ f.table_filteredextremes <- function(condA, condB, nindex, nshow=10,
 
 
 ###################################################
-### code chunk number 14: s_functions.Rnw:253-267
+### code chunk number 12: s_functions.Rnw:231-245
 ###################################################
 f.vectorsforgoseq <- function(condA, condB, nindex,
                               universefunc = function(x) rep(TRUE,dim(x)[1]),
@@ -254,7 +229,7 @@ f.vectorsforgoseq <- function(condA, condB, nindex,
 
 
 ###################################################
-### code chunk number 15: s_functions.Rnw:271-281
+### code chunk number 13: s_functions.Rnw:249-259
 ###################################################
 f.goseqresults <- function( goseqvectors , genome='mm9', id='geneSymbol', ...) {
     pwf <- nullp(DEgenes = goseqvectors$DEgenes, genome=genome,
@@ -269,7 +244,7 @@ f.goseqresults <- function( goseqvectors , genome='mm9', id='geneSymbol', ...) {
 
 
 ###################################################
-### code chunk number 16: s_functions.Rnw:288-304
+### code chunk number 14: s_functions.Rnw:266-282
 ###################################################
 f.getrpkmstats <- function(cds,cond,length_bases){
     # Assumes sizeFactors(cds) are millions of total reads
@@ -290,7 +265,7 @@ f.getrpkmstats <- function(cds,cond,length_bases){
 
 
 ###################################################
-### code chunk number 17: s_functions.Rnw:313-339
+### code chunk number 15: s_functions.Rnw:291-317
 ###################################################
 f.barplotwitherror <- function(height, dheight.neg = NULL,
                                dheight.plus = dheight.neg, horiz=FALSE, ...){
@@ -321,7 +296,7 @@ f.barplotwitherror <- function(height, dheight.neg = NULL,
 
 
 ###################################################
-### code chunk number 18: s_functions.Rnw:348-358
+### code chunk number 16: s_functions.Rnw:326-336
 ###################################################
 f.getFromPreprocBed <- function( desiredlist,  patternname, samplelist,
                                 preprocdir ='./intermediate_results/'){
@@ -336,7 +311,7 @@ f.getFromPreprocBed <- function( desiredlist,  patternname, samplelist,
 
 
 ###################################################
-### code chunk number 19: s_functions.Rnw:364-380
+### code chunk number 17: s_functions.Rnw:342-358
 ###################################################
 f.plotselectedCovs <- function( covdata, x = seq.int(-10000,9999,10),
                                xlab = 'bp-TSS'){
@@ -357,7 +332,7 @@ f.plotselectedCovs <- function( covdata, x = seq.int(-10000,9999,10),
 
 
 ###################################################
-### code chunk number 20: s_functions.Rnw:388-403
+### code chunk number 18: s_functions.Rnw:366-381
 ###################################################
 f.avgFromPreprocBed <- function( gs_list,  patternname, samplelist,
                                 preprocdir ='./intermediate_results/'){
@@ -377,7 +352,7 @@ f.avgFromPreprocBed <- function( gs_list,  patternname, samplelist,
 
 
 ###################################################
-### code chunk number 21: s_functions.Rnw:406-422
+### code chunk number 19: s_functions.Rnw:384-400
 ###################################################
 f.avgFromPreprocBed_old <- function( gs_list,  patternname, samplelist,
                                 preprocdir ='./intermediate_results/'){
@@ -398,7 +373,7 @@ f.avgFromPreprocBed_old <- function( gs_list,  patternname, samplelist,
 
 
 ###################################################
-### code chunk number 22: s_functions.Rnw:428-450
+### code chunk number 20: s_functions.Rnw:406-428
 ###################################################
 library(MASS)
 library(caTools)
@@ -425,7 +400,7 @@ f.chipControlWeights <- function( gene_intensity , genesubset, plotresults = FAL
 
 
 ###################################################
-### code chunk number 23: s_functions.Rnw:455-471
+### code chunk number 21: s_functions.Rnw:433-449
 ###################################################
 f.controlFromPreprocBed <- function( gs_list, gene_intensity,
                                     patternname, samplelist,
@@ -446,7 +421,7 @@ f.controlFromPreprocBed <- function( gs_list, gene_intensity,
 
 
 ###################################################
-### code chunk number 24: s_functions.Rnw:474-493
+### code chunk number 22: s_functions.Rnw:452-471
 ###################################################
 f.controlFromPreprocBed_old <- function( gs_list, gene_intensity,
                                     patternname, samplelist,
@@ -470,7 +445,7 @@ f.controlFromPreprocBed_old <- function( gs_list, gene_intensity,
 
 
 ###################################################
-### code chunk number 25: s_functions.Rnw:499-519
+### code chunk number 23: s_functions.Rnw:477-497
 ###################################################
 f.plotavgCovs <- function( covdata, covdatacontrol, ylims = NULL,
                           x = seq.int(-10000,9999,10), xlab = 'bp-TSS'){
@@ -495,7 +470,7 @@ f.plotavgCovs <- function( covdata, covdatacontrol, ylims = NULL,
 
 
 ###################################################
-### code chunk number 26: s_functions.Rnw:525-534
+### code chunk number 24: s_functions.Rnw:503-512
 ###################################################
 f.weightedcdf <- function( weights, Yvalues ) {
 	# arguments must be vectors with names. 
@@ -509,7 +484,7 @@ f.weightedcdf <- function( weights, Yvalues ) {
 
 
 ###################################################
-### code chunk number 27: s_functions.Rnw:543-553
+### code chunk number 25: s_functions.Rnw:521-531
 ###################################################
 f.plotTFcdfs <- function(tf, tf_datacolumns = colnames(tf), genes.in.red, genes.in.blue, ...){
     for (tfname in tf_datacolumns) {
@@ -524,7 +499,7 @@ f.plotTFcdfs <- function(tf, tf_datacolumns = colnames(tf), genes.in.red, genes.
 
 
 ###################################################
-### code chunk number 28: s_functions.Rnw:574-588
+### code chunk number 26: s_functions.Rnw:552-566
 ###################################################
 f.fixedcolsplit <- function(string, pattern, names){
     require(stringr)
@@ -543,7 +518,7 @@ f.fixedcolsplit <- function(string, pattern, names){
 
 
 ###################################################
-### code chunk number 29: s_functions.Rnw:594-603
+### code chunk number 27: s_functions.Rnw:572-581
 ###################################################
 f.colsplitandmerge <- function( x, coltosplit, pattern, names) {
     strtosplit <- x[,coltosplit]
@@ -557,7 +532,7 @@ f.colsplitandmerge <- function( x, coltosplit, pattern, names) {
 
 
 ###################################################
-### code chunk number 30: s_functions.Rnw:606-610
+### code chunk number 28: s_functions.Rnw:584-588
 ###################################################
 f.previewmelted <- function( melteddata){ 
     lapply( split( melteddata[,c('meta','variable')], 
@@ -566,7 +541,7 @@ f.previewmelted <- function( melteddata){
 
 
 ###################################################
-### code chunk number 31: s_functions.Rnw:613-624
+### code chunk number 29: s_functions.Rnw:591-602
 ###################################################
 f.subsetmelted <- function( m.data, subsetlist) {
     rowstokeep.overall <- rep(FALSE, length(m.data[,1]))
@@ -582,7 +557,7 @@ f.subsetmelted <- function( m.data, subsetlist) {
 
 
 ###################################################
-### code chunk number 32: s_functions.Rnw:627-641
+### code chunk number 30: s_functions.Rnw:605-619
 ###################################################
 f.quantXcat_melted <- function( quantdata, catdata) {
     outdat <- dlply( catdata, 'meta', function(x) 
@@ -601,7 +576,7 @@ f.quantXcat_melted <- function( quantdata, catdata) {
 
 
 ###################################################
-### code chunk number 33: s_functions.Rnw:644-648
+### code chunk number 31: s_functions.Rnw:622-626
 ###################################################
 f.addunitbox <- function() {
     boxdata <- data.frame( xs = c(1,1,-1,-1,1), ys = c(1,-1,-1,1,1))
@@ -610,7 +585,7 @@ f.addunitbox <- function() {
 
 
 ###################################################
-### code chunk number 34: s_functions.Rnw:654-659
+### code chunk number 32: s_functions.Rnw:632-637
 ###################################################
 f.simpleCap <- function(x) {
     s <- strsplit(x, " ")[[1]]

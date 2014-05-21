@@ -6,7 +6,9 @@ library(xtable)
 
 load('./intermediate_results/genenames.RData')
 load('./intermediate_results/geneTable.RData')
-load('./intermediate_results/countsTable.RData')
+countsTable <- read.delim("./inputdata/feature_summary_firstannot",
+                          header=TRUE, stringsAsFactors=FALSE )
+
 
 geneTable$Gene_Symbol <- genenames
 rownames(geneTable)<-geneTable$first_annot

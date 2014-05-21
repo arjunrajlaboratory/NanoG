@@ -69,26 +69,13 @@ f.prettycohtable <- function(x, metastocompare) {
 
 
 ###################################################
-### code chunk number 4: funcs_figsource.Rnw:69-83
+### code chunk number 4: funcs_figsource.Rnw:69-69
 ###################################################
-require(goseq)
-f.rungoseq <- function( geneids, member.of.subset, dataforbias, 
-	gene2cat, test.cats='GO:BP', method = 'Wallenius'){
-    DEgenes <- as.vector(member.of.subset)
-    names(DEgenes) <- geneids
-    bias.data <- as.vector(dataforbias)
-    names(bias.data) <- geneids
-    pwf <- nullp(DEgenes = DEgenes, genome = 'mm9', 
-	id = 'geneSymbol', bias.data=bias.data)
-    GOdat <- goseq(pwf, genome = 'mm9', id = 'geneSymbol',
-	gene2cat = gene2cat, test.cats = 'GO:BP', method = method)
-    GOdat$GOTERM <- Term(GOdat$category)
-    return(GOdat)
-}
+
 
 
 ###################################################
-### code chunk number 5: funcs_figsource.Rnw:88-164
+### code chunk number 5: funcs_figsource.Rnw:74-150
 ###################################################
 f.GOsizefilter <- function( gotable, gosizecutoff, keepsmaller = TRUE ){
     gotable <- as.data.table(gotable)
@@ -169,19 +156,13 @@ f.projectGO <- function( gotable, genehits, categories, allowoverlap = FALSE ) {
 
 
 ###################################################
-### code chunk number 6: funcs_figsource.Rnw:167-174
+### code chunk number 6: funcs_figsource.Rnw:153-154
 ###################################################
-f.golist.to.godf <- function(goannot){ 
-    gonames <- unlist(goannot,use.names=FALSE)
-    genenames <- ldply(goannot, length)
-    genenames <- rep( genenames[['.id']], genenames[['V1']])
-    goannotlong <- data.frame( GeneSymbol = genenames, Category = gonames)
-    return( data.table(goannotlong) )
-}
+
 
 
 ###################################################
-### code chunk number 7: funcs_figsource.Rnw:177-236
+### code chunk number 7: funcs_figsource.Rnw:157-216
 ###################################################
 f.GOxdeseq <- function( genehits, fullgotable, melteddeseq, 
     GOsizecutoff = 1000, gonumcutoff = NULL ) {
@@ -245,7 +226,7 @@ f.plotFracsxdeseq.twoside <- function( dftoplot ) {
 
 
 ###################################################
-### code chunk number 8: funcs_figsource.Rnw:239-263
+### code chunk number 8: funcs_figsource.Rnw:219-243
 ###################################################
 f.makegreedyGOtable <- function( genehits = genehits, gotable = goannotlong, 
     gosigdata = cats_hits, gosizecutoff = 250 , abbrlength = 40) {
@@ -274,7 +255,7 @@ f.makegreedyGOtable <- function( genehits = genehits, gotable = goannotlong,
 
 
 ###################################################
-### code chunk number 9: funcs_figsource.Rnw:265-278
+### code chunk number 9: funcs_figsource.Rnw:245-258
 ###################################################
 f.deseqXgreedyGO <- function( melteddeseq, greedyGOresult, fullgotable ) {
     dftoplot <- subset(melteddeseq, meta %in% c('GFP.NEG','ALL.DIFF'))
@@ -292,7 +273,7 @@ f.deseqXgreedyGO <- function( melteddeseq, greedyGOresult, fullgotable ) {
 
 
 ###################################################
-### code chunk number 10: funcs_figsource.Rnw:280-290
+### code chunk number 10: funcs_figsource.Rnw:260-270
 ###################################################
 f.plotgreedygostats <- function( greedyGOtable ) {
     greedyGOtable$issig <- factor( greedyGOtable$issig, c(FALSE, TRUE ) ) 
@@ -307,7 +288,7 @@ f.plotgreedygostats <- function( greedyGOtable ) {
 
 
 ###################################################
-### code chunk number 11: funcs_figsource.Rnw:296-302
+### code chunk number 11: funcs_figsource.Rnw:276-282
 ###################################################
 f.getHighIn <- function( x ) {
     condsinvolved <- matrix( unlist( str_split( x$meta, '\\.')),
@@ -318,7 +299,7 @@ f.getHighIn <- function( x ) {
 
 
 ###################################################
-### code chunk number 12: funcs_figsource.Rnw:308-345
+### code chunk number 12: funcs_figsource.Rnw:288-325
 ###################################################
 f.cross.wGenelist <- function( x, genelist ){
     m.gl <- melt(genelist)
@@ -360,7 +341,7 @@ f.plot_hitlist_genelist <- function(deseqcompared = 'GFP.NEG',genelist,
 
 
 ###################################################
-### code chunk number 13: funcs_figsource.Rnw:350-373
+### code chunk number 13: funcs_figsource.Rnw:330-353
 ###################################################
 require(gtools)
 require(grid)

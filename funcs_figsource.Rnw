@@ -67,20 +67,6 @@ f.prettycohtable <- function(x, metastocompare) {
 \section{ Functios to run GOSeq }
 
 <<>>=
-require(goseq)
-f.rungoseq <- function( geneids, member.of.subset, dataforbias, 
-	gene2cat, test.cats='GO:BP', method = 'Wallenius'){
-    DEgenes <- as.vector(member.of.subset)
-    names(DEgenes) <- geneids
-    bias.data <- as.vector(dataforbias)
-    names(bias.data) <- geneids
-    pwf <- nullp(DEgenes = DEgenes, genome = 'mm9', 
-	id = 'geneSymbol', bias.data=bias.data)
-    GOdat <- goseq(pwf, genome = 'mm9', id = 'geneSymbol',
-	gene2cat = gene2cat, test.cats = 'GO:BP', method = method)
-    GOdat$GOTERM <- Term(GOdat$category)
-    return(GOdat)
-}
 @
 
 \section{ Functions to run a very basic GO analysis - greedy}
@@ -165,13 +151,7 @@ f.projectGO <- function( gotable, genehits, categories, allowoverlap = FALSE ) {
 @
 
 <<>>=
-f.golist.to.godf <- function(goannot){ 
-    gonames <- unlist(goannot,use.names=FALSE)
-    genenames <- ldply(goannot, length)
-    genenames <- rep( genenames[['.id']], genenames[['V1']])
-    goannotlong <- data.frame( GeneSymbol = genenames, Category = gonames)
-    return( data.table(goannotlong) )
-}
+
 @
 
 <<>>=

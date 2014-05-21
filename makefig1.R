@@ -1,5 +1,3 @@
-
-
 library(plyr)
 library(reshape2)
 library(ggplot2)
@@ -10,7 +8,7 @@ library(grid)
 Stangle('s_functions.Rnw');source('s_functions.R')
 Stangle('funcs_figsource.Rnw');source('funcs_figsource.R')
 
-
+load('intermediate_results/m.deseq.RData')
 
 base_size <- 10
 
@@ -20,6 +18,8 @@ for (sortname in c('A','C')){
     sortdata[[sortname]] <- read.delim(paste0('./inputdata/sorter',sortname,'.txt'),header=TRUE)
     sortdata[[sortname]][['FITC']] <- sortdata[[sortname]][['FITC.E14']]
 }
+
+
 sortdata <- melt( sortdata, c('FITC'))
 sortdata <- f.colsplitandmerge( sortdata, 'variable', '.', c('variable','meta'))
 sortdata <- subset(sortdata, variable %in% c('Events','Fluorescence'))
@@ -75,7 +75,6 @@ genelist <- list(
 
 
 
-source('loadMDeseq.R')
 dftoplot <- rbind( m.deseq )
 dftoplot <- subset( dftoplot, variable %in% c('log2Fold','issig') )
 dftoplot <- dcast( dftoplot, 'source+meta+GeneSymbol ~ variable')

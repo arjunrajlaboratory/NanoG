@@ -1,8 +1,26 @@
-VPATH = outputdata intermediate_results inputdata
+VPATH = intermediate_results inputdata outputdata/fig1 outputdata
 
 
 
-## Run DESeq testing
+## make figure 1
+
+figure1 : sorterA.eps  abranchesdotplot.eps
+
+
+sorterA.eps  abranchesdotplot.eps : makefig1.R  m.deseq.RData \
+ sorterA.txt  sorterC.txt
+
+	Rscript makefig1.R 
+
+
+## make a melted (stacked) form of the DESeq test data.
+
+m.deseq.RData : prepareMDeseq.R nbinomindex.RData
+
+	Rscript prepareMDeseq.R
+
+
+## Run DESeq testing: this is a slow step.
 
 nbinomindex.RData : cds.RData | computeDeseq.R
 

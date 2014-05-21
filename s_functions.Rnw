@@ -17,29 +17,7 @@ f.plot_counts_alacarte<-function(vectorofgenes, countlist, condlist, ...) {
 
 \subsection{Running \deseq}
 
-A helper function that will take two condition names, conduct the
-differential expression test, and write the data to a file.
-<<>>=
-f.deseq_do_andwrite <- function(countdataset, condpair,
-                                fileprefix ) {
-    message( paste( 'Testing', condpair[1], 'vs', condpair[2]))
-    nbinomresult <- nbinomTest(countdataset, condpair[1], condpair[2])
-    filename <- paste0(fileprefix, condpair[1] , condpair[2])
-    write.table( nbinomresult, file = filename, quote = FALSE, sep = '\t')
-    return( list(condA = condpair[1], condB = condpair[2],
-                 filename = filename))
-}
-@
 
-Do all the pairwise tests, write the results to files, and make an index.
-<<>>=
-f.deseq_testallpairs <- function(countdataset, fileprefix ) {
-    FUN = function (x)  f.deseq_do_andwrite(countdataset,x,fileprefix)
-    nbinomindex<- apply(X = combn(levels(conditions(countdataset)),m=2),
-                        MARGIN = 2, FUN = FUN)
-    return(nbinomindex)
-}
-@
 
 A function for retrieving a DESEQ test. \texttt{nindex} should be a
 list of elements, each of which has elements \texttt{condA},

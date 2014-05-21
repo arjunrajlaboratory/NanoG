@@ -3,7 +3,7 @@ VPATH = intermediate_results inputdata outputdata
 
 
 
-allFigures : figure1
+allFigures : figure1  figure2  figureCoherence  figurePLUSS
 
 
 ## make figures
@@ -18,6 +18,16 @@ figure2 : makefig2.R  m.deseq.RData  goannot.RData  cats_hits.RData \
  m.kim.RData  m.rex1.RData  m.hayashi.RData  m.morgani.RData
 
 	Rscript makefig2.R
+
+
+figureCoherence : makefigCoh.R  m.deseq.RData  goannot.RData
+
+	Rscript makefigCoh.R
+
+
+figurePLUSS : makefigPLUSS.R  m.deseq.RData
+
+	Rscript makefigPLUSS.R
 
 
 ## run GO-related tasks

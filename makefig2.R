@@ -265,172 +265,170 @@ invisible(dev.off())
 
 # \section{Scatter plots}
 
-<<>>=
-load('./intermediate_results/m.deseq.RData')
+
 load('./intermediate_results/m.rex1.RData')
 load('./intermediate_results/m.hayashi.RData')
 load('./intermediate_results/m.morgani.RData')
-@
-<<>>=
+
+
 dftoplot <- rbind(m.rex1, m.deseq, m.hayashi, m.morgani)
 dftoplot <- subset(dftoplot, variable %in% c('log2Fold','issig'))
 dftoplot <- subset(dftoplot, meta %in% c('GFP.NEG','ALL.DIFF','Rexpos.Rexneg',
     'ESC.EpiLC:day1','HVneg.HVpos_2iLIF_avg'))
 dftoplot <- dcast(dftoplot, 'GeneSymbol ~ meta + variable')
 dftoplot[,-1] <- sapply(dftoplot[,-1], function(x) ifelse(is.finite(x),x,NA) )
-@
 
-# <<>>=
-# f.scatterprettier <- function(gplotin, countlim = 60){
-#     gplotout <- gplotin + coord_equal()
-#     gplotout <- gplotout + 
-# # 	geom_hline(yintercept = 0 ) + 
-# # 	geom_vline(xintercept = 0) +
-# 	geom_bin2d(binwidth=c(0.2,0.2)) 
-#     rain.colors <- rev( rainbow(7)[1:6])
-#     gplotout <- gplotout + scale_fill_gradientn(
-# 	colours=rain.colors,
-# 	breaks = c(0,countlim),
-# 	guide = guide_colourbar(direction='horizontal',title=NULL,
-# 	    label.position='top', barwidth = 2, barheight=0.25,
-# 	    ticks = FALSE, )
-#     )
-#     gplotout <- gplotout + theme_grey(base_size=base_size)
-#     gplotout <- gplotout + theme(
-# 	legend.position = c(0.60,0.12),
-# 	legend.background = element_blank(),
-# 	plot.margin=unit(rep(0,4),'lines'),
-# 	axis.text = element_text(size=rel(0.8), colour='black'),
-# 	axis.ticks = element_line(colour='black'),
-# 	axis.title.x = element_blank(),
-# 	axis.title.y = element_blank()
-# # 	panel.grid.major = element_blank()
-#     )
-#     gplotout <- gplotout + scale_y_continuous(limits=c(-5,5),breaks=c(-4,-2,0,2,4))
-# #     gplotout <- gplotout + geom_hline(yintercept=0) + geom_vline(xintercept=0)
-#     return(gplotout)
-# }
-# genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'GFP.NEG',
-#     select = 'GeneSymbol' , drop = TRUE)
-# df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
-# q <- ggplot( df2, aes(GFP.NEG_log2Fold, Rexpos.Rexneg_log2Fold))  
-# q <- f.scatterprettier(q)
-# q <- q + xlim(-2,4) 
-# qrex <- q
-# genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'GFP.NEG',
-#     select = 'GeneSymbol' , drop = TRUE)
-# df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
-# q <- ggplot( df2, aes(GFP.NEG_log2Fold, HVneg.HVpos_2iLIF_avg_log2Fold)) 
-# q <- f.scatterprettier(q, 140)
-# q <- q + xlim(-2,4) 
-# qhex <- q
-# genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'ALL.DIFF',
-#     select = 'GeneSymbol' , drop = TRUE)
-# df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
-# q <- ggplot( df2, aes(ALL.DIFF_log2Fold, `ESC.EpiLC:day1_log2Fold`)) 
-# q <- f.scatterprettier(q,120)
-# q <- q + xlim(-3,3)
-# qepi <- q
-# @
 
-# <<>>=
-# f.gridannotedscatter <- function(gplot, vp, posylab='hello',negylab='bye',
-#     negxlab = '', posxlab = '', subtitle=''){
-#    print(gplot, vp = vp)
-#    downViewport(vp$name)
-# #    longerstr <- ifelse(nchar(posylab)>=nchar(negylab), posylab, negylab)
-#    vpdepth <- downViewport('axis-l.3-3-3-3')
-#    xpos <- unit(-2.5, 'strwidth', 'A')
-#    grid.text( posylab, x = xpos, y= 0.6, just=c('center','bottom'))
-#    grid.text( negylab, x = xpos, y= 0.4, just=c('center','top'))
-#     grid.lines( x=xpos,y=c(0.45,0.55),gp=gpar(fill='black',lwd=1),
-# 	arrow=arrow(angle=45,type='closed', 
-# 	    length=unit(0.5,'strwidth','A'), ends='both'))
-#    upViewport(vpdepth)
-#    vpdepth <- downViewport('axis-b.4-4-4-4')
-#    ypos <- unit(-1.5, 'strheight', 'A')
-#    grid.text( negxlab, x=0.3, y=ypos, just=c('right','center'))
-#    grid.text( posxlab, x=0.7, y=ypos, just=c('left','center'))
-#     grid.lines( x=c(0.4,0.6),y=ypos,gp=gpar(fill='black',lwd=1),
-# 	arrow=arrow(angle=45,type='closed', 
-# 	    length=unit(0.5,'strwidth','A'), ends='both'))
-#    subtitleypos <- unit(-3.5, 'strheight','A')
-#    grid.text( subtitle, x=0.5, y=subtitleypos, just=c('center','center'))
-#    upViewport(vpdepth)
-#    upViewport(1)
-#    return(NULL)
-# }
-# f.drawrowscatter <- function(){
-#     unit.oneplot <- unit.c( stringWidth('EpiLC+'),unit(1,'null'))
-#     scattergrid <- grid.layout(3, 7, 
-# 	heights = unit( c(1,1.5,1.5), c('null','strheight','strheight'),
-# 	    list(NULL,'V','V')),
-# 	widths = unit.c(unit(2,'strheight','A'), unit.oneplot, 
-# 	    unit.oneplot, unit.oneplot 
-# 	    )
-#     )
-#     pushViewport(viewport(layout=scattergrid))
-#     vprex <- viewport(layout.pos.row=1,layout.pos.col=3,name='vprex')
-#     vphex <- viewport(layout.pos.row=1,layout.pos.col=5,name='vphex')
-#     vpepi <- viewport(layout.pos.row=1,layout.pos.col=7,name='vpepi')
-#     vpylabel <- viewport(layout.pos.row=1,layout.pos.col=1,name='vpylabel')
-#     f.gridannotedscatter( qrex, vprex, 'Rex1-', 'Rex1+','VNP+','VNP-')
-#     f.gridannotedscatter( qhex, vphex, 'Hex+', 'Hex-','VNP+','VNP-',
-# 	subtitle='log2( RNA fold change)')
-#     f.gridannotedscatter( qepi, vpepi, 'EpiLC', 'ESC','Stem','Diff')
-#     grid.text('log2( RNA fold change )', rot=90, vp=vpylabel)
-#     upViewport(1)
-# }
-# @
+
+f.scatterprettier <- function(gplotin, countlim = 60){
+    gplotout <- gplotin + coord_equal()
+    gplotout <- gplotout + 
+# 	geom_hline(yintercept = 0 ) + 
+# 	geom_vline(xintercept = 0) +
+	geom_bin2d(binwidth=c(0.2,0.2)) 
+    rain.colors <- rev( rainbow(7)[1:6])
+    gplotout <- gplotout + scale_fill_gradientn(
+	colours=rain.colors,
+	breaks = c(0,countlim),
+	guide = guide_colourbar(direction='horizontal',title=NULL,
+	    label.position='top', barwidth = 2, barheight=0.25,
+	    ticks = FALSE, )
+    )
+    gplotout <- gplotout + theme_grey(base_size=base_size)
+    gplotout <- gplotout + theme(
+	legend.position = c(0.60,0.12),
+	legend.background = element_blank(),
+	plot.margin=unit(rep(0,4),'lines'),
+	axis.text = element_text(size=rel(0.8), colour='black'),
+	axis.ticks = element_line(colour='black'),
+	axis.title.x = element_blank(),
+	axis.title.y = element_blank()
+# 	panel.grid.major = element_blank()
+    )
+    gplotout <- gplotout + scale_y_continuous(limits=c(-5,5),breaks=c(-4,-2,0,2,4))
+#     gplotout <- gplotout + geom_hline(yintercept=0) + geom_vline(xintercept=0)
+    return(gplotout)
+}
+genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'GFP.NEG',
+    select = 'GeneSymbol' , drop = TRUE)
+df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
+q <- ggplot( df2, aes(GFP.NEG_log2Fold, Rexpos.Rexneg_log2Fold))  
+q <- f.scatterprettier(q)
+q <- q + xlim(-2,4) 
+qrex <- q
+genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'GFP.NEG',
+    select = 'GeneSymbol' , drop = TRUE)
+df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
+q <- ggplot( df2, aes(GFP.NEG_log2Fold, HVneg.HVpos_2iLIF_avg_log2Fold)) 
+q <- f.scatterprettier(q, 140)
+q <- q + xlim(-2,4) 
+qhex <- q
+genestokeep <- subset( m.deseq, variable == 'issig' & value == 1 & meta == 'ALL.DIFF',
+    select = 'GeneSymbol' , drop = TRUE)
+df2 <- subset( dftoplot, GeneSymbol %in% genestokeep) 
+q <- ggplot( df2, aes(ALL.DIFF_log2Fold, `ESC.EpiLC:day1_log2Fold`)) 
+q <- f.scatterprettier(q,120)
+q <- q + xlim(-3,3)
+qepi <- q
+
+
+
+f.gridannotedscatter <- function(gplot, vp, posylab='hello',negylab='bye',
+    negxlab = '', posxlab = '', subtitle=''){
+   print(gplot, vp = vp)
+   downViewport(vp$name)
+#    longerstr <- ifelse(nchar(posylab)>=nchar(negylab), posylab, negylab)
+   vpdepth <- downViewport('axis-l.3-3-3-3')
+   xpos <- unit(-2.5, 'strwidth', 'A')
+   grid.text( posylab, x = xpos, y= 0.6, just=c('center','bottom'))
+   grid.text( negylab, x = xpos, y= 0.4, just=c('center','top'))
+    grid.lines( x=xpos,y=c(0.45,0.55),gp=gpar(fill='black',lwd=1),
+	arrow=arrow(angle=45,type='closed', 
+	    length=unit(0.5,'strwidth','A'), ends='both'))
+   upViewport(vpdepth)
+   vpdepth <- downViewport('axis-b.4-4-4-4')
+   ypos <- unit(-1.5, 'strheight', 'A')
+   grid.text( negxlab, x=0.3, y=ypos, just=c('right','center'))
+   grid.text( posxlab, x=0.7, y=ypos, just=c('left','center'))
+    grid.lines( x=c(0.4,0.6),y=ypos,gp=gpar(fill='black',lwd=1),
+	arrow=arrow(angle=45,type='closed', 
+	    length=unit(0.5,'strwidth','A'), ends='both'))
+   subtitleypos <- unit(-3.5, 'strheight','A')
+   grid.text( subtitle, x=0.5, y=subtitleypos, just=c('center','center'))
+   upViewport(vpdepth)
+   upViewport(1)
+   return(NULL)
+}
+f.drawrowscatter <- function(){
+    unit.oneplot <- unit.c( stringWidth('EpiLC+'),unit(1,'null'))
+    scattergrid <- grid.layout(3, 7, 
+	heights = unit( c(1,1.5,1.5), c('null','strheight','strheight'),
+	    list(NULL,'V','V')),
+	widths = unit.c(unit(2,'strheight','A'), unit.oneplot, 
+	    unit.oneplot, unit.oneplot 
+	    )
+    )
+    pushViewport(viewport(layout=scattergrid))
+    vprex <- viewport(layout.pos.row=1,layout.pos.col=3,name='vprex')
+    vphex <- viewport(layout.pos.row=1,layout.pos.col=5,name='vphex')
+    vpepi <- viewport(layout.pos.row=1,layout.pos.col=7,name='vpepi')
+    vpylabel <- viewport(layout.pos.row=1,layout.pos.col=1,name='vpylabel')
+    f.gridannotedscatter( qrex, vprex, 'Rex1-', 'Rex1+','VNP+','VNP-')
+    f.gridannotedscatter( qhex, vphex, 'Hex+', 'Hex-','VNP+','VNP-',
+	subtitle='log2( RNA fold change)')
+    f.gridannotedscatter( qepi, vpepi, 'EpiLC', 'ESC','Stem','Diff')
+    grid.text('log2( RNA fold change )', rot=90, vp=vpylabel)
+    upViewport(1)
+}
+
 
 # \section{Figure assembly}
 
-# Assemble top:
-# <<>>=
-# f.labelsubplot <- function( subplotlabel, x=stringWidth('A'), y=1, ...) {
-#     grid.text(subplotlabel,x=x,y=y, just=c('left','top'), 
-# 	gp=gpar(fontsize=12, fontface='bold'), ...)
-# }
-# f.maketophalf <- function(){
-#     pushViewport(viewport(layout = 
-# 	grid.layout(1,2, widths = c(0.3,0.7))))
-#     vpfold<-viewport(layout.pos.col=1,name='vpfold')
-#     vpgo<-viewport(layout.pos.col=2,name='vpgo')
-#     f.drawfoldchange(qfold,vp=vpfold)
-#     pushViewport(vpgo)
-#     f.drawGOanalysis()
-#     upViewport(1)
-#     f.labelsubplot('A', vp = vpfold)
-#     f.labelsubplot('B', vp = vpgo)
-#     upViewport(1)
-# }
-# f.makebottomhalf <- function(){
-#     pushViewport(viewport(layout=grid.layout(1,3,widths=c(0.575,0.025,0.4))))
-#     pushViewport( viewport(layout.pos.col=1))
-#     f.drawrowscatter()
-#     f.labelsubplot('C', y=0.95)
-#     upViewport(1)
-#     vptfs <- viewport(layout.pos.col=3)
-#     print(qtfxdeseq, vp = vptfs)
-#     f.labelsubplot('D', y=0.95, vp = vptfs)
-#     upViewport(1)
-# }
-# f.plotfig2 <- function(){
-#     pushViewport( viewport(gp=gpar(fontsize=base_size*0.8)))
-#     pushViewport( viewport( layout=grid.layout(3,1,heights=c(6,0.25,6))))
-#     pushViewport( viewport( layout.pos.row=1, name = 'vptop'))
-#     f.maketophalf()
-#     upViewport(1)
-#     pushViewport( viewport( layout.pos.row=3, name = 'vptop'))
-#     f.makebottomhalf()
-#     upViewport(1)
-# }
-# @
-# <<>>=
-# setEPS()
-# postscript('./outputdata/fig2/figHitBasics2.eps',width=7,height=4)
-# f.plotfig2()
-# dev.off()
-# @
+
+
+f.labelsubplot <- function( subplotlabel, x=stringWidth('A'), y=1, ...) {
+    grid.text(subplotlabel,x=x,y=y, just=c('left','top'), 
+	gp=gpar(fontsize=12, fontface='bold'), ...)
+}
+f.maketophalf <- function(){
+    pushViewport(viewport(layout = 
+	grid.layout(1,2, widths = c(0.3,0.7))))
+    vpfold<-viewport(layout.pos.col=1,name='vpfold')
+    vpgo<-viewport(layout.pos.col=2,name='vpgo')
+    f.drawfoldchange(qfold,vp=vpfold)
+    pushViewport(vpgo)
+    f.drawGOanalysis()
+    upViewport(1)
+    f.labelsubplot('A', vp = vpfold)
+    f.labelsubplot('B', vp = vpgo)
+    upViewport(1)
+}
+f.makebottomhalf <- function(){
+    pushViewport(viewport(layout=grid.layout(1,3,widths=c(0.575,0.025,0.4))))
+    pushViewport( viewport(layout.pos.col=1))
+    f.drawrowscatter()
+    f.labelsubplot('C', y=0.95)
+    upViewport(1)
+    vptfs <- viewport(layout.pos.col=3)
+    print(qtfxdeseq, vp = vptfs)
+    f.labelsubplot('D', y=0.95, vp = vptfs)
+    upViewport(1)
+}
+f.plotfig2 <- function(){
+    pushViewport( viewport(gp=gpar(fontsize=base_size*0.8)))
+    pushViewport( viewport( layout=grid.layout(3,1,heights=c(6,0.25,6))))
+    pushViewport( viewport( layout.pos.row=1, name = 'vptop'))
+    f.maketophalf()
+    upViewport(1)
+    pushViewport( viewport( layout.pos.row=3, name = 'vptop'))
+    f.makebottomhalf()
+    upViewport(1)
+}
+
+
+setEPS()
+postscript('./outputdata/fig2/figHitBasics2.eps',width=7,height=4)
+f.plotfig2()
+dev.off()
 
 

@@ -45,13 +45,32 @@ m.rex1.RData : prepareRex1.R  fullTable.RData \
 
 m.hayashi.RData : prepareHayashi11.R \
  externaldata/HayashiCell11/GSE30056.txt.labelled \
- externaldata/HayashiCell11/indexGSE30056.txt
+ externaldata/HayashiCell11/indexGSE30056.txt \
+ externaldata/HayashiCell11/GPL1261-14790.txt
 
 	Rscript prepareHayashi11.R
 
 
 
-m.morgani.RData : 
+m.morgani.RData : prepareMorgani.R \
+ externaldata/Morgani13/indexGSE45182.txt \
+ externaldata/Morgani13/GSE45182_RefSeqInformation.txt \
+ externaldata/Morgani13/GSM1098619_rpkm_GMEM_HV-_rep1.txt \
+ externaldata/Morgani13/GSM1098620_rpkm_GMEM_HV-_rep2.txt \
+ externaldata/Morgani13/GSM1098621_rpkm_GMEM_HV+_rep1.txt \
+ externaldata/Morgani13/GSM1098622_rpkm_GMEM_HV+_rep2.txt \
+ externaldata/Morgani13/GSM1098623_rpkm_2i_HV-_rep1.txt \
+ externaldata/Morgani13/GSM1098624_rpkm_2i_HV-_rep2.txt \
+ externaldata/Morgani13/GSM1098625_rpkm_2i_HV+_rep1.txt \
+ externaldata/Morgani13/GSM1098626_rpkm_2i_HV+_rep2.txt \
+ externaldata/Morgani13/GSM1098627_rpkm_2i_LIF-_unsorted_rep1.txt \
+ externaldata/Morgani13/GSM1098628_rpkm_2i_LIF-_unsorted_rep2.txt \
+ externaldata/Morgani13/GSM1098629_rpkm_2i_LIF+_unsorted_rep1.txt \
+ externaldata/Morgani13/GSM1098630_rpkm_2i_LIF+_unsorted_rep2.txt
+
+	Rscript prepareMorgani.R
+
+  
 
 ## extract TF-binding data from literature csv
 

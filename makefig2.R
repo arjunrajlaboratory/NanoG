@@ -192,94 +192,93 @@ invisible(dev.off())
 
 # \section{TF binding plots}
 
-# <<>>=
-# load('./intermediate_results/m.kim.RData')
-# @
 
-# <<>>=
-# dftoplot <- m.kim[,c('meta','value')]
-# dftoplot <- subset( dftoplot, !(meta == 'birA'))
-# names(dftoplot) <- c('TF','GeneSymbol')
-# dftoplot <- merge(dftoplot, dftoplot, by='GeneSymbol')
-# # dftoplot <- transform( dftoplot, TF.x = factor(TF.x, levels(m.kim$meta) ),
-# #     TF.y = factor(TF.y, levels(m.kim$meta)))
-# dftoplot <- transform( dftoplot, 
-#     TF.x = factor(toupper(TF.x), toupper(levels(m.kim$meta)) ),
-#     TF.y = factor(toupper(TF.y), toupper(levels(m.kim$meta))))
-# df2 <- subset( m.deseq, meta %in% c('ALL.DIFF','GFP.NEG' ) )
-# df2 <- subset( df2, variable %in% c('log2Fold','issig','signedsig') )
-# df2 <- dcast( df2, 'GeneSymbol + meta ~ variable')
-# df3 <- merge( dftoplot, df2, by='GeneSymbol', all.x=FALSE, all.y=FALSE)
-# require(data.table)
-# dftoplot <- as.data.table(df3)
-# dftoplot <- dftoplot[, list( Num = length(GeneSymbol)), 
-#     by = c('TF.x','TF.y','meta','signedsig')]
-# dftoplot <- dftoplot[, list( Num = Num, signedsig = signedsig, 
-#     Frac = Num/sum(Num) ), 
-#     by = c('TF.x','TF.y','meta')]
-# dftoplot <- subset( dftoplot, !(signedsig == 0 ))
-# dftoplot$signedsig <- factor(dftoplot$signedsig, c(-1,1))
+load('./intermediate_results/m.kim.RData')
 
-# dfuniv <- as.data.table(df2)
-# dfuniv <- dfuniv[, list( Num = length(GeneSymbol)),
-#     by = c('meta','signedsig')]
-# dfuniv <- dfuniv[, list( Num = Num, signedsig = signedsig, Frac=Num/sum(Num)),
-#     by = c('meta')]
-# dfuniv <- subset(dfuniv, !(signedsig == 0 ))
-# dfuniv$signedsig <- factor(dfuniv$signedsig, c(-1,1))
 
-# dftoplot <- subset( dftoplot, as.character(TF.x) == as.character(TF.y) )
-# dftoplot$highin <- f.getHighIn( dftoplot )
-# dftoplot$highin <- factor( dftoplot$highin, c('GFP','NEG','ALL','DIFF') )
-# dftoplot <- transform( dftoplot, 
-#     highin = factor(highin, labels = paste( 'up in\n', 
-#     f.sample.labeller(value=levels(highin)))))
-# dfuniv$highin <- f.getHighIn( dfuniv )
-# dfuniv$highin <- factor( dfuniv$highin, c('GFP','NEG','ALL','DIFF') )
-# dfuniv <- transform( dfuniv, 
-#     highin = factor(highin, labels = paste( 'up in\n', 
-#     f.sample.labeller(value=levels(highin)))))
-# q <- ggplot( dftoplot, aes( y = Frac, x = TF.x ) ) +
-#     geom_hline( data=dfuniv, aes(yintercept = Frac )) +
-#     geom_point() + facet_grid('. ~ highin') + coord_flip()
-# q <- q + theme_minimal(base_size=base_size) 
-# q <- q + theme(
-#     panel.margin = unit(0.5,'lines'),
-#     axis.title.x = element_text(hjust=0.5,size=rel(0.8)),
-#     axis.title.y = element_text(size=rel(0.8))
-# )
-# # q <- q + theme(plot.margin=unit(rep(0,4),'lines'))
-# q <- q + scale_y_continuous(limits=c(0,0.3), breaks=c(0,0.1,0.2,0.3), 
-#     labels = c('0','.1','.2',''))
-# q <- q + ylab('\nFraction of genes bound by\ntranscription factor that are hits')
-# q <- q + xlab('\nTranscription factor\n')
-# #q <- q + theme(axis.text.x = element_text(angle = -90,hjust=0, vjust=0.5))
-# qtfxdeseq <- q
-# @
-# <<>>=
-# setEPS()
-# postscript('./outputdata/fig2/TFxdeseq.eps', width = 4.5, height=2.4)
-# print(q)
-# invisible(dev.off())
-# @
+
+dftoplot <- m.kim[,c('meta','value')]
+dftoplot <- subset( dftoplot, !(meta == 'birA'))
+names(dftoplot) <- c('TF','GeneSymbol')
+dftoplot <- merge(dftoplot, dftoplot, by='GeneSymbol')
+# dftoplot <- transform( dftoplot, TF.x = factor(TF.x, levels(m.kim$meta) ),
+#     TF.y = factor(TF.y, levels(m.kim$meta)))
+dftoplot <- transform( dftoplot, 
+    TF.x = factor(toupper(TF.x), toupper(levels(m.kim$meta)) ),
+    TF.y = factor(toupper(TF.y), toupper(levels(m.kim$meta))))
+df2 <- subset( m.deseq, meta %in% c('ALL.DIFF','GFP.NEG' ) )
+df2 <- subset( df2, variable %in% c('log2Fold','issig','signedsig') )
+df2 <- dcast( df2, 'GeneSymbol + meta ~ variable')
+df3 <- merge( dftoplot, df2, by='GeneSymbol', all.x=FALSE, all.y=FALSE)
+require(data.table)
+dftoplot <- as.data.table(df3)
+dftoplot <- dftoplot[, list( Num = length(GeneSymbol)), 
+    by = c('TF.x','TF.y','meta','signedsig')]
+dftoplot <- dftoplot[, list( Num = Num, signedsig = signedsig, 
+    Frac = Num/sum(Num) ), 
+    by = c('TF.x','TF.y','meta')]
+dftoplot <- subset( dftoplot, !(signedsig == 0 ))
+dftoplot$signedsig <- factor(dftoplot$signedsig, c(-1,1))
+
+dfuniv <- as.data.table(df2)
+dfuniv <- dfuniv[, list( Num = length(GeneSymbol)),
+    by = c('meta','signedsig')]
+dfuniv <- dfuniv[, list( Num = Num, signedsig = signedsig, Frac=Num/sum(Num)),
+    by = c('meta')]
+dfuniv <- subset(dfuniv, !(signedsig == 0 ))
+dfuniv$signedsig <- factor(dfuniv$signedsig, c(-1,1))
+
+dftoplot <- subset( dftoplot, as.character(TF.x) == as.character(TF.y) )
+dftoplot$highin <- f.getHighIn( dftoplot )
+dftoplot$highin <- factor( dftoplot$highin, c('GFP','NEG','ALL','DIFF') )
+dftoplot <- transform( dftoplot, 
+    highin = factor(highin, labels = paste( 'up in\n', 
+    f.sample.labeller(value=levels(highin)))))
+dfuniv$highin <- f.getHighIn( dfuniv )
+dfuniv$highin <- factor( dfuniv$highin, c('GFP','NEG','ALL','DIFF') )
+dfuniv <- transform( dfuniv, 
+    highin = factor(highin, labels = paste( 'up in\n', 
+    f.sample.labeller(value=levels(highin)))))
+q <- ggplot( dftoplot, aes( y = Frac, x = TF.x ) ) +
+    geom_hline( data=dfuniv, aes(yintercept = Frac )) +
+    geom_point() + facet_grid('. ~ highin') + coord_flip()
+q <- q + theme_minimal(base_size=base_size) 
+q <- q + theme(
+    panel.margin = unit(0.5,'lines'),
+    axis.title.x = element_text(hjust=0.5,size=rel(0.8)),
+    axis.title.y = element_text(size=rel(0.8))
+)
+# q <- q + theme(plot.margin=unit(rep(0,4),'lines'))
+q <- q + scale_y_continuous(limits=c(0,0.3), breaks=c(0,0.1,0.2,0.3), 
+    labels = c('0','.1','.2',''))
+q <- q + ylab('\nFraction of genes bound by\ntranscription factor that are hits')
+q <- q + xlab('\nTranscription factor\n')
+#q <- q + theme(axis.text.x = element_text(angle = -90,hjust=0, vjust=0.5))
+qtfxdeseq <- q
+
+
+setEPS()
+postscript('./outputdata/fig2/TFxdeseq.eps', width = 4.5, height=2.4)
+print(q)
+invisible(dev.off())
+
 
 # \section{Scatter plots}
 
-# <<>>=
-# load('./intermediate_results/m.deseq.RData')
-# load('./intermediate_results/m.rex1.RData')
-# load('./intermediate_results/m.marksrna.RData')
-# load('./intermediate_results/m.hayashi.RData')
-# load('./intermediate_results/m.morgani.RData')
-# @
-# <<>>=
-# dftoplot <- rbind(m.rex1, m.deseq, m.marksrna, m.hayashi, m.morgani)
-# dftoplot <- subset(dftoplot, variable %in% c('log2Fold','issig'))
-# dftoplot <- subset(dftoplot, meta %in% c('GFP.NEG','ALL.DIFF','Rexpos.Rexneg',
-#     'twoi.serum','ESC.EpiLC:day1','HVneg.HVpos_2iLIF_avg'))
-# dftoplot <- dcast(dftoplot, 'GeneSymbol ~ meta + variable')
-# dftoplot[,-1] <- sapply(dftoplot[,-1], function(x) ifelse(is.finite(x),x,NA) )
-# @
+<<>>=
+load('./intermediate_results/m.deseq.RData')
+load('./intermediate_results/m.rex1.RData')
+load('./intermediate_results/m.hayashi.RData')
+load('./intermediate_results/m.morgani.RData')
+@
+<<>>=
+dftoplot <- rbind(m.rex1, m.deseq, m.hayashi, m.morgani)
+dftoplot <- subset(dftoplot, variable %in% c('log2Fold','issig'))
+dftoplot <- subset(dftoplot, meta %in% c('GFP.NEG','ALL.DIFF','Rexpos.Rexneg',
+    'ESC.EpiLC:day1','HVneg.HVpos_2iLIF_avg'))
+dftoplot <- dcast(dftoplot, 'GeneSymbol ~ meta + variable')
+dftoplot[,-1] <- sapply(dftoplot[,-1], function(x) ifelse(is.finite(x),x,NA) )
+@
 
 # <<>>=
 # f.scatterprettier <- function(gplotin, countlim = 60){

@@ -14,7 +14,8 @@ figure1 : makefig1.R  m.deseq.RData \
 	Rscript makefig1.R 
 
 
-figure2 : makefig2.R  m.deseq.RData  goannot.RData  cats_hits.RData
+figure2 : makefig2.R  m.deseq.RData  goannot.RData  cats_hits.RData \
+ m.kim.RData  m.rex1.RData  m.hayashi.RData  m.morgani.RData
 
 	Rscript makefig2.R
 
@@ -30,6 +31,33 @@ goannot.RData : prepareGOAnnot.R  fullTable.RData
 
 	Rscript prepareGOAnnot.R
 
+
+## extract other expression data form literature
+
+m.rex1.RData : prepareRex1.R  fullTable.RData \
+ externaldata/marksetalcell/features_GSM850398 \
+ externaldata/marksetalcell/features_GSM850399 \
+ externaldata/marksetalcell/transcripts_GSM850398 \
+ externaldata/marksetalcell/transcripts_GSM850399
+
+	Rscript prepareRex1.R
+
+
+m.hayashi.RData : prepareHayashi11.R \
+ externaldata/HayashiCell11/GSE30056.txt.labelled \
+ externaldata/HayashiCell11/indexGSE30056.txt
+
+	Rscript prepareHayashi11.R
+
+
+
+m.morgani.RData : 
+
+## extract TF-binding data from literature csv
+
+m.kim.RData : prepareKimEtAl.R  externaldata/KimCell08/mmc2.csv
+
+	Rscript prepareKimEtAl.R
 
 
 ## make a melted (stacked) form of the DESeq test data.

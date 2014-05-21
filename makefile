@@ -2,16 +2,17 @@ VPATH = intermediate_results inputdata outputdata/fig1 outputdata
 
 
 
+
+allFigures : figure1
+
+
+
 ## make figure 1
 
-figure1 : sorterA.eps  abranchesdotplot.eps
-
-
-sorterA.eps  abranchesdotplot.eps : makefig1.R  m.deseq.RData \
+figure1 : makefig1.R  m.deseq.RData \
  sorterA.txt  sorterC.txt
-
+	echo "forAbranches"
 	Rscript makefig1.R 
-
 
 ## make a melted (stacked) form of the DESeq test data.
 

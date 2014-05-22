@@ -1,0 +1,60 @@
+
+This contains the code to analyze the results of our nanog paper.
+
+Steps to use it:
+
+1. clone this repository on your local drive.
+
+2. get the packed data and unpack it somewhere. It should contain subdirectories:
+
+inputdata
+outputdata
+intermediate_results
+externaldata
+
+3. Make symbolic links from within the repository directory (from 1) to each of the
+subdirectories of the unpacked data.
+
+Example shell commands would be:
+
+$  cd nanog/Repository
+
+$  ln -s path/To/UnpackedData/inputdata inputdata
+
+... and the same for the other subdirectories.
+
+
+4. use linux/GNU "make" from the command line. 
+
+Just typing:
+
+$  make
+or
+$  make allFigures
+
+
+will cause all figures (all the content in the outputdata directory) to be remade.
+
+If you only want to re-make a particular figure, you can choose from the targets that are displayed
+if you run this command:
+
+$  make -pn | perl -F: -ane 'print "$F[0]\n" if /^\w+\s*:/' | sort
+
+For example:
+
+$  make figureFISH
+
+To start from a clean slate in terms of the output directory:
+
+$  make cleanOutput
+
+and then you can make the figures again.
+
+
+To redo all the intermediate calculations, some of which are very lengthy, 
+(~ 1 hour a piece for DESeq calculations and certain bioinformatics database queries)
+run :
+
+$  make cleanIntermediates
+
+and then run make without arguments.

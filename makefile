@@ -69,6 +69,11 @@ figureMacArthur : makefigmacarthur.R \
 	Rscript makefigmacarthur.R
 
 
+figureTopHits :  m.deseq.RData  m.rpkm.RData  goannot.RData
+
+	Rscript makefigtophits.R
+
+
 ## pertaining to lincRNA
 
 linccounts.RData : prepareLincCounts.R \
@@ -93,7 +98,7 @@ nbinomindex.wlincs.RData : | computeDeseqWLincs.R \
 	Rscript computeDeseqWLincs.R
  
 
-m.lincs.RData : prepareMLincs.R nbinomindex.wlincs.RData
+m.lincs.RData : prepareMLincs.R | nbinomindex.wlincs.RData
 
 	Rscript prepareMLincs.R
 
@@ -171,16 +176,23 @@ m.deseq.RData : prepareMDeseq.R nbinomindex.RData
 
 
 
-## Run DESeq testing: this is a slow step.
+## Run DESeq testing
 
-nbinomindex.RData : cds.RData | computeDeseq.R
+m.rpkm.RData : prepareMRPKM.R \
+ fullTable.RData \
+ cds.RData \
+ inputdata/readsummaryfeaturequant
+
+	Rscript prepareMRPKM.R
+
+# slow step
+nbinomindex.RData : | cds.RData computeDeseq.R
 
 	Rscript computeDeseq.R
 
 
-## Prepare data for DESeq testing
-
-cds.RData : | prepareForDeseqTest.R fullTable.RData
+cds.RData : prepareForDeseqTest.R \
+ | fullTable.RData
 
 	Rscript prepareForDeseqTest.R
 

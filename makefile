@@ -47,6 +47,16 @@ figurePCA : makefigSpca.R  cds.RData
 	Rscript makefigSpca.R
 
 
+figureFISH : makefigfish.R \
+ new130727.csv \
+ new130729.csv \
+ new130821.csv \
+ new130903.csv \
+ new131008.csv 
+
+	Rscript makefigfish.R
+
+
 ## run GO-related tasks
 
 cats_hits.RData : computeGOseq.R  goannot.RData m.deseq.RData

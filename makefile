@@ -36,6 +36,11 @@ figureReconstitution : makefigReconstitute.R \
 	Rscript makefigReconstitute.R
 
 
+figureHox : makefigHox.R  m.deseq.RData
+
+	Rscript makefigHox.R
+
+
 ## run GO-related tasks
 
 cats_hits.RData : computeGOseq.R  goannot.RData m.deseq.RData

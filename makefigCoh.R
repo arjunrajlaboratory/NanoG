@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figCoh'), showWarnings = FALSE)
 
 library(plyr)
 library(reshape2)

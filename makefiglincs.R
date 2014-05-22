@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figlincs'), showWarnings = FALSE)
 
 library(plyr)
 library(reshape2)

@@ -1,4 +1,4 @@
-
+dir.create(file.path('outputdata/figmacarthur'), showWarnings = FALSE)
 
 library(reshape2)
 library(plyr)

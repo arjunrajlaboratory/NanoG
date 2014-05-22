@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figPLUSS'), showWarnings = FALSE)
 
 library(plyr)
 library(reshape2)

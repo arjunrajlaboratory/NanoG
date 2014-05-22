@@ -1,4 +1,4 @@
-
+dir.create(file.path('outputdata/figtophits'), showWarnings = FALSE)
 
 library(plyr)
 library(reshape2)

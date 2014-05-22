@@ -1,3 +1,5 @@
+dir.create(file.path('outputdata/fig1'), showWarnings = FALSE)
+
 library(plyr)
 library(reshape2)
 library(ggplot2)

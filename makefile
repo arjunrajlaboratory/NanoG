@@ -1,10 +1,8 @@
 VPATH = intermediate_results inputdata outputdata
 
 
-
-
 allFigures : figure1  figure2  figureCoherence  figurePLUSS \
- figureReconstitution figurePCA
+ figureReconstitution figurePCA  figureFISH
 
 
 ## make figures
@@ -57,6 +55,48 @@ figureFISH : makefigfish.R \
 	Rscript makefigfish.R
 
 
+figureLincRNA : makefiglincs.R \
+ linccounts.RData \
+ externaldata/guttman11/supp1.csv \
+ externaldata/guttman11/supp7.csv \
+ m.lincs.RData
+
+
+figureMacArthur : makefigmacarthur.R \
+ m.deseq.RData \
+ m.mac.RData
+
+	Rscript makefigmacarthur.R
+
+
+## pertaining to lincRNA
+
+linccounts.RData : prepareLincCounts.R \
+ inputdata/CountslincRNA_A1 \
+ inputdata/CountslincRNA_A2 \
+ inputdata/CountslincRNA_A3 \
+ inputdata/CountslincRNA_A4 \
+ inputdata/CountslincRNA_A5 \
+ inputdata/CountslincRNA_C1 \
+ inputdata/CountslincRNA_C2 \
+ inputdata/CountslincRNA_C3 \
+ inputdata/CountslincRNA_C4 \
+ inputdata/CountslincRNA_C5
+
+	Rscript prepareLincCounts.R
+
+
+nbinomindex.wlincs.RData : | computeDeseqWLincs.R \
+ linccounts.RData \
+ fullTable.RData
+
+	Rscript computeDeseqWLincs.R
+ 
+
+m.lincs.RData : prepareMLincs.R nbinomindex.wlincs.RData
+
+	Rscript prepareMLincs.R
+
 ## run GO-related tasks
 
 cats_hits.RData : computeGOseq.R  goannot.RData m.deseq.RData
@@ -108,6 +148,13 @@ m.morgani.RData : prepareMorgani.R \
 	Rscript prepareMorgani.R
 
   
+m.mac.RData : prepareMacArthur.R \
+ externaldata/MacArthur12/GSE40335.txt.labelled \
+ externaldata/MacArthur12/sampledescriptions.txt \
+ externaldata/MacArthur12/GPL6246.annot.IDandGeneSymbol
+
+	Rscript prepareMacArthur.R
+
 
 ## extract TF-binding data from literature csv
 

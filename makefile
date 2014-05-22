@@ -57,9 +57,11 @@ figureFISH : makefigfish.R \
 
 figureLincRNA : makefiglincs.R \
  linccounts.RData \
- externaldata/guttman11/supp1.csv \
+ updatelincs.RData \
  externaldata/guttman11/supp7.csv \
  m.lincs.RData
+
+	Rscript makefiglincs.R
 
 
 figureMacArthur : makefigmacarthur.R \
@@ -101,6 +103,15 @@ nbinomindex.wlincs.RData : | computeDeseqWLincs.R \
 m.lincs.RData : prepareMLincs.R | nbinomindex.wlincs.RData
 
 	Rscript prepareMLincs.R
+
+
+# requires bedtools
+updatelincs.RData : prepareUpdateLincs.R \
+ linccounts.RData \
+ externaldata/guttman11/supp1.csv
+
+	Rscript prepareUpdateLincs.R
+
 
 ## run GO-related tasks
 

@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figReconstitution'), showWarnings = FALSE)
 
 library(ggplot2)
 library(plyr)

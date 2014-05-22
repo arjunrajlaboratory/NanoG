@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figSpca'), showWarnings = FALSE)
 
 # \section{PCA based overview of the data}
 

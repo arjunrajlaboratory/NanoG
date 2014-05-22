@@ -1,3 +1,4 @@
+dir.create(file.path('outputdata/figfish'), showWarnings = FALSE)
 
 library(ggplot2)
 library(reshape2)

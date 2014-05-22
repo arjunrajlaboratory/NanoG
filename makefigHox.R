@@ -1,4 +1,4 @@
-
+dir.create(file.path('outputdata/figHox'), showWarnings = FALSE)
 
 library(plyr)
 library(reshape2)

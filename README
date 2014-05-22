@@ -17,14 +17,14 @@ subdirectories of the unpacked data.
 
 Example shell commands would be:
 
-$  cd nanog/Repository
+$  cd nanogRepository
 
 $  ln -s path/To/UnpackedData/inputdata inputdata
 
 ... and the same for the other subdirectories.
 
 
-4. use linux/GNU "make" from the command line. 
+4. use linux/GNU "make" from the command line within the nanogRepository.
 
 Just typing:
 

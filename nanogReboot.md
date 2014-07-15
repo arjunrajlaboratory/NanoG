@@ -11,10 +11,27 @@ Of the more than 1300 genes that we are confident are differentially expressed b
 
 We were intrigued by the lineage marker signature in spontaneously differentiated cells and we investigated how that is manifest at the single cell level to answer a few questions. First, we observed only mild downward fold-changes up to a factor of 2 for pluripotency genes in our *Nanog*:VNP(-) population, and we suspected that the fold-changes are artificially dampened by reporter false negative cells.  Regarding lineage-associated genes, although they constitute the  strongest expression signature of spontaneously differentiated cells, we observed upwards fold-changes in *Nanog*:VNP(-) mostly between factors of 4 and 8. Underlying this could be low-level but somewhat uniform expression of these genes in large fractions of *Nanog*:VNP(-) cells, at the level of few transcripts per cell. Instead, we considered it more likely that these lineage-associated gene may be expressed in very small and possibly exclusive subpopulations within *Nanog*:VNP(-) that represent relatively advanced stages of lineage commitment. We were also very interested to see if lineage-associated gene expression arises mostly in cells that have been thoroughly depleted of pluripotency gene expression.
 
-To overcome population averaging and make these determinations, we used multiplex single molecule RNA FISH to simultaneously count the number of mRNA of specific subsets of genes in single ES cells from the Nd cell line. To avoid reporter issues, we imaged unsorted populations and compensated by imaging on the order of a thousand cells in each experiment to sample infrequently occurring cell expression patterns.
+
+            Oct4 and Rex1
+
+We determined by RNA-FISH that *Nanog* mRNA(-) cells are severely depleted of other pluripotency markers. These cells do not express the NANOG target *Rex1* (Fig. S6C), and 70\% of them do not express *Oct4* mRNA (Fig. [[FIG:fish]]A). Since the *Oct4* mRNA half-life is quite long, with little appreciable decay even in a 6 hour observation window [AbranchesPlosONE13], the lack of *Oct4* mRNA means that these cells stopped transcribing *Oct4* for at least a day or more. Since maintaining *Oct4* gene expression within a tight concentration interval is considered essential to the ES state [NiwaNatGen00], these cells have likely exited pluripotency. The fold changes by RNA-FISH for *Oct4* and *Rex1* between *Nanog* mRNA(-) and *Nanog* mRNA(+) populations are considerably larger than those we found by RNA-Seq between cells sorted into (+) and (-) on the basis of our *Nanog*:VNP reporter. We confirmed that this can be explained by false negatives. We found that approximately 50\% of *Nanog*:VNP mRNA(-) cells in 2i + LIF are actually *Nanog* mRNA(+) and have the same distribution of *Nanog* mRNA levels as the *Nanog*:VNP mRNA(+) population (Fig. S6). On the other hand, VNP transcripts themselves are at least ten times less abundant in *Nanog*:VNP(-) than in *Nanog*:VNP(+), which establishes both the purity of our VNP sort and a close correlation between VNP protein and mRNA levels. 
+
+
+
+        Maturity of differentiation programs by RNA FISH
+
+To assess the uniformity of lineage marker expression within the *Nanog* mRNA(-) subpopulation, we counted *Nanog*, *Crabp2* (ectoderm lineage) and *T* (*Brachyury*, mesendoderm lineage) transcripts in `N=2360` Nd cells grown in 2i+LIF. We found that only a few cells within the set of *Nanog* mRNA(-) cells express any particular lineage priming gene but when they do, it is at the level of tens (*Crabp2*) or hundreds (*T*) of transcripts (See Fig. [[FIG:fish]]B and S8A). The majority of cells expressing *T* and the vast majority expressing *Crabp2* are *Nanog* mRNA(-). Interestingly, we observed 2/2360 cells that simultaneously expressed both of these lineage markers.
+
+
+We further investigated the maturity of the lineage specification programs that are active in *Nanog* mRNA(-) cells by looking for coexpression of genes belonging to overlapping lineages using the specific example of the mesodermal markers *T* and *Tbx6* [ChapmanDevBio96]. Out of 764 cells, only two were *Tbx6* mRNA(+) and they were a subset of the seven *T* mRNA(+) cells (Fig. [[FIG:fish]]C). We note that *T* and *Tbx6* are independent mesoderm markers in the sense that the onset of *Tbx6* expression does not require the activity of *T* [ChapmanDevBio96], suggesting that a full-scale mesodermal program is underway in these few cells. 
+
 
 
 
 # Discussion #
 
 It is interesting that within stem-ness promoting cultures, spontaneously differentiated cells arise that are characterized mainly by lineage marker and developmental gene expression. In the case of culture-wide differentiation, removal of the factors in the media that maintain the stem cell state leads to cells escaping the pluripotent state and understandably evolving along lineage paths. It is nontrivial that spontaneously differentiated cells, which still experience the media factors that keep cells as stem cells in the first place, arrive at states defined by lineage and developmental marker expression. 
+
+The strong correlations between *Nanog*, *Rex1* and *Oct4* at the single cell level shows that their switching from (+) to (-) is part of a concerted deviation from pluripotency rather than the effect of standalone transcriptional bursting. 
+
+Especially considering that these cells are also *Oct4* mRNA(-), we conclude that the *Tbx6* up-regulation in *Nanog*:VNP(-) cannot be interpreted as lineage priming that will spontaneously revert back to the pluripotent "unprimed" ground state. This may also be the case for many more genes up-regulated in *Nanog*:VNP(-) cells.

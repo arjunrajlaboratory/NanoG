@@ -139,3 +139,6 @@ dev.off()
 
 
 
+
+
+write.csv(df2, './outputdata/figCoh/quadrantGenes.csv')

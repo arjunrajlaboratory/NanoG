@@ -19,14 +19,17 @@ source('makeFluidigmGeneList.R')
 
 comparison <- f.cross.wGenelist( comparison, genelist) 
 
+base_size <- 10 
+
 q <- ggplot(comparison, aes(x=fold_2iL, y=log2Fold))
-q <- q + geom_point(aes(color=L1))
+q <- q + geom_point(aes(shape=L1))
+q <- q + scale_shape(guide=FALSE)
 q <- q + xlab('fluidigm 2i logFold')
 q <- q + ylab('rnaseq 2i logFold')
-q <- q + geom_text(aes(label=GeneSymbol),size=3, hjust=0, vjust=0)
-q <- q + theme_minimal()
+q <- q + geom_text(aes(label=GeneSymbol),size=2, hjust=0, vjust=0)
+q <- q + theme_minimal(base_size=base_size)
 
-pdf('./untracked/fluidigmCompare.pdf',width=7,height=6)
+pdf('./outputdata/figFluidigm/vsfluidigm.pdf',width=4.4,height=4.2)
 print(q)
 dev.off()
 

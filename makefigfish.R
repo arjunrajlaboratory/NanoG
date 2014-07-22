@@ -12,6 +12,11 @@ pathToFISH <- 'inputdata/'
 outputTextFile <- './outputdata/figfish/countsForVennDiagrams.txt'
 capture.output(print('counts for Venn diagrams'), file = outputTextFile, append = FALSE)
 
+printToStatsFile <- function(x){
+    capture.output(print(x),
+        file = outputTextFile,
+        append = TRUE)
+}
 
 datnew <- list()
 datnew[[1]] <- cbind( read.csv(paste0(pathToFISH,'new130727.csv')), date = '130727')
@@ -44,10 +49,7 @@ print(q)
 dev.off()
 
 
-capture.output(
-    print(table(dftoplot[,c('T.Lev','Crabp2.Lev','Nanog.Lev')])),
-    file = outputTextFile,
-    append = TRUE)
+printToStatsFile(table(dftoplot[,c('T.Lev','Crabp2.Lev','Nanog.Lev')]))
 
 
 
@@ -133,25 +135,19 @@ dev.off()
 
 
 
-capture.output(
-    print(addmargins(table(datrexvnpnew[,c('VNP.Lev','Nanog.Lev')]))),
-    file = outputTextFile, 
-    append = TRUE)
+printToStatsFile(addmargins(table(datrexvnpnew[,c('VNP.Lev','Nanog.Lev')])))
 
 nanogAndVNPMeans <- ddply(datrexvnpnew, c('VNP.Lev','Nanog.Lev'), summarize, 
 	meanNanog.RNA = mean(Nanog.RNA), meanVNP.RNA = mean(VNP.RNA))
 
-capture.output(
-    print(nanogAndVNPMeans),
-    file = outputTextFile,
-    append = TRUE)
+printToStatsFile(nanogAndVNPMeans)
+
+printToStatsFile(addmargins(table(datrexvnpnew[,c('Rex1.Lev','Nanog.Lev')])))
 
 
-capture.output(
-    print(addmargins(table(datrexvnpnew[,c('Rex1.Lev','Nanog.Lev')]))),
-    file = outputTextFile,
-    append = TRUE)
-
+printToStatsFile('for Rex, VNP fold change:')
+printToStatsFile(ddply(datrexvnpnew, 'Nanog.Lev', summarize, Rex1.RNA=mean(Rex1.RNA),
+    VNP.RNA=mean(VNP.RNA)))
 
 # section{Oct4, T, Tbx6}
 
@@ -175,11 +171,7 @@ datnew <- transform(datnew, Tbx6.Lev = factor(Tbx6.RNA > 10, c(TRUE,FALSE),
 
 
 
-capture.output(
-    print(table(datnew[,c('T.Lev','Tbx6.Lev','Oct4.Lev')])),
-    file = outputTextFile,
-    append = TRUE)
-
+printToStatsFile(table(datnew[,c('T.Lev','Tbx6.Lev','Oct4.Lev')]))
 
 
 q <- ggplot(datnew, aes(T.RNA, Tbx6.RNA, color = Oct4.Lev)) + geom_jitter()
@@ -225,11 +217,14 @@ datnew <- transform(datnew, Oct4.Lev = factor(Oct4.RNA > 80, c(TRUE,FALSE),
     labels = c('Oct4 > 80', 'Oct4 < 80')))
 
 
-capture.output(
-    print(table(datnew[,c('Oct4.Lev','Nanog.Lev')])),
-    file = outputTextFile,
-    append = TRUE)
+printToStatsFile(table(datnew[,c('Oct4.Lev','Nanog.Lev')]))
 
+printToStatsFile(addmargins(table(datnew$Nanog.Lev)))
+
+printToStatsFile(addmargins(prop.table(table(datnew$Nanog.Lev))))
+
+printToStatsFile('for Oct4 fold change:')
+printToStatsFile(ddply(datnew, 'Nanog.Lev', summarize, Oct4=mean(Oct4.RNA)))
 
 
 q <- ggplot(datnew, aes(Nanog.RNA)) + geom_histogram(binwidth=10)

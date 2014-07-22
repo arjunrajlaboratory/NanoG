@@ -26,10 +26,11 @@ q <- q + geom_point(aes(shape=L1))
 q <- q + scale_shape(guide=FALSE)
 q <- q + xlab('fluidigm 2i logFold')
 q <- q + ylab('rnaseq 2i logFold')
-q <- q + geom_text(aes(label=GeneSymbol),size=2, hjust=0, vjust=0)
+q <- q + geom_text(aes(label=GeneSymbol),size=3, hjust=0, vjust=0)
 q <- q + theme_minimal(base_size=base_size)
 
-pdf('./outputdata/figFluidigm/vsfluidigm.pdf',width=4.4,height=4.2)
+setEPS()
+postscript('./outputdata/figFluidigm/vsfluidigm.eps',width=6,height=6)
 print(q)
 dev.off()
 

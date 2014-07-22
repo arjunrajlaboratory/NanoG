@@ -2,10 +2,15 @@ VPATH = intermediate_results inputdata outputdata
 
 
 allFigures : figure1  figure2  figureCoherence  figurePLUSS \
- figureReconstitution figurePCA  figureFISH
+ figureReconstitution figurePCA  figureFISH  figureFluidigm
 
 
 ## make figures
+
+figureFluidigm : m.deseq.RData \
+ inputdata/fluidigmAvg.csv
+
+	Rscript compareToFluidigm.R
 
 figure1 : makefig1.R  m.deseq.RData \
  sorterA.txt  sorterC.txt

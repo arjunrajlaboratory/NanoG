@@ -18,13 +18,31 @@ subdirectories of the unpacked data.
 Example shell commands would be:
 
 $  cd nanogRepository
+$  ln -sf path/To/UnpackedData/inputdata inputdata
 
-$  ln -s path/To/UnpackedData/inputdata inputdata
+... and the same for the other subdirectories. 
 
-... and the same for the other subdirectories.
+4. mark all existing files as up-to date, then delete empty figure placeholder files
+
+$  make -t
+$  rm figure*
+
+Upon first installing the nanog code and linking to the dropbox, it may be
+that the last-modified-dates will suggest to make that it needs to redo
+many of the intermediate computations, even though that is not so.
+make -t
+tells make to mark all files as up to date. This has two bad side-effects:
+1. it creates actual (empty) figure files in the repository even though
+the 'figure' make targets are just fake targets. This is fixed by deleting
+
+2. it creates empty intermediate files in the repo instead of marking
+the files in intermediate_files/ as up to date. 
+I should fix this by having make explicitly known where each file is
+instead of using the VPATH convenience.
 
 
-4. use linux/GNU "make" from the command line within the nanogRepository.
+
+5. use linux/GNU "make" from the command line within the nanogRepository.
 
 Just typing:
 

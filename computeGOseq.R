@@ -14,8 +14,7 @@ f.rungoseq <- function( geneids, member.of.subset, dataforbias,
     names(DEgenes) <- geneids
     bias.data <- as.vector(dataforbias)
     names(bias.data) <- geneids
-    pwf <- nullp(DEgenes = DEgenes, genome = 'mm9', 
-    id = 'geneSymbol', bias.data=bias.data)
+    pwf <- nullp(DEgenes, 'mm9', 'geneSymbol') #, bias.data=bias.data)
     GOdat <- goseq(pwf, genome = 'mm9', id = 'geneSymbol',
     gene2cat = gene2cat, test.cats = 'GO:BP', method = method)
     GOdat$GOTERM <- Term(GOdat$category)
@@ -40,4 +39,4 @@ f.calccats_hits <- function(){
 
 cats_hits <- f.calccats_hits()
 
-save(list='cats_hits',file='./intermediate_results/cats_hits.RData')
+save(list='cats_hits',file='./intermediate_results/cats_hits_new.RData')

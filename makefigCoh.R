@@ -8,6 +8,8 @@ library(stringr)
 library(data.table)
 library(grid)
 library(gridExtra)
+library(caTools)
+library(gtools)
 Stangle('s_functions.Rnw');source('s_functions.R')
 Stangle('funcs_figsource.Rnw');source('funcs_figsource.R')
 
@@ -115,11 +117,12 @@ CohGOcats <- ddply(df2, c('GFP.NEG','ALL.DIFF'),
 	gotable = goannotlong, gosigdata = NULL, gosizecutoff = 750 ),
 	.progress = 'text')
 CohGOcats.top <- ddply(CohGOcats, c('GFP.NEG','ALL.DIFF'),
-    head, n=5)
+    head, n=10)
+write.csv(CohGOcats.top, './outputdata/figCoh/coherence_table_750.csv')
 
 
 setEPS()
-postscript('./outputdata/figCoh/CohGO_750.eps',width=7,height=7)
+postscript('./outputdata/figCoh/CohGO_750.eps',width=7,height=14)
 pushViewport(viewport(gp=gpar(fontsize=8)))
 grid.draw(tableGrob(CohGOcats.top[,c(1:7)],show.rownames=FALSE))
 dev.off()
@@ -130,9 +133,11 @@ CohGOcats <- ddply(df2, c('GFP.NEG','ALL.DIFF'),
 	gotable = goannotlong, gosigdata = NULL, gosizecutoff = 250 ),
 	.progress = 'text')
 CohGOcats.top <- ddply(CohGOcats, c('GFP.NEG','ALL.DIFF'),
-    head, n=5)
+    head, n=10)
+write.csv(CohGOcats.top, './outputdata/figCoh/coherence_table_250.csv')
+
 setEPS()
-postscript('./outputdata/figCoh/CohGO_250.eps',width=7,height=7)
+postscript('./outputdata/figCoh/CohGO_250.eps',width=7,height=14)
 pushViewport(viewport(gp=gpar(fontsize=8)))
 grid.draw(tableGrob(CohGOcats.top[,c(1:7)],show.rownames=FALSE))
 dev.off()

@@ -81,7 +81,7 @@ f.golist.to.godf <- function(goannot){
 
 
 ###################################################
-### code chunk number 5: funcs_figsource.Rnw:81-157
+### code chunk number 5: funcs_figsource.Rnw:81-158
 ###################################################
 f.GOsizefilter <- function( gotable, gosizecutoff, keepsmaller = TRUE ){
     gotable <- as.data.table(gotable)
@@ -134,6 +134,7 @@ f.greedyGO <- function( gotable, genehits, goorderFUN, gonumcutoff=20){
 	}
     }
     outgo <- cbind(TERM=Term(as.character(outgo$Category)),outgo)
+    outgo <- data.frame(outgo)
     outgo <- outgo[,c('TERM','Num','Num.hits','Num.univ','Category')]
     outgo$Num.hits.rndm <- frac.hits.rndm * outgo$Num.univ
     return( outgo )
@@ -162,13 +163,13 @@ f.projectGO <- function( gotable, genehits, categories, allowoverlap = FALSE ) {
 
 
 ###################################################
-### code chunk number 6: funcs_figsource.Rnw:160-161
+### code chunk number 6: funcs_figsource.Rnw:161-162
 ###################################################
 
 
 
 ###################################################
-### code chunk number 7: funcs_figsource.Rnw:164-223
+### code chunk number 7: funcs_figsource.Rnw:165-224
 ###################################################
 f.GOxdeseq <- function( genehits, fullgotable, melteddeseq, 
     GOsizecutoff = 1000, gonumcutoff = NULL ) {
@@ -232,7 +233,7 @@ f.plotFracsxdeseq.twoside <- function( dftoplot ) {
 
 
 ###################################################
-### code chunk number 8: funcs_figsource.Rnw:226-250
+### code chunk number 8: funcs_figsource.Rnw:227-251
 ###################################################
 f.makegreedyGOtable <- function( genehits = genehits, gotable = goannotlong, 
     gosigdata = cats_hits, gosizecutoff = 250 , abbrlength = 40) {
@@ -261,7 +262,7 @@ f.makegreedyGOtable <- function( genehits = genehits, gotable = goannotlong,
 
 
 ###################################################
-### code chunk number 9: funcs_figsource.Rnw:252-265
+### code chunk number 9: funcs_figsource.Rnw:253-266
 ###################################################
 f.deseqXgreedyGO <- function( melteddeseq, greedyGOresult, fullgotable ) {
     dftoplot <- subset(melteddeseq, meta %in% c('GFP.NEG','ALL.DIFF'))
@@ -279,7 +280,7 @@ f.deseqXgreedyGO <- function( melteddeseq, greedyGOresult, fullgotable ) {
 
 
 ###################################################
-### code chunk number 10: funcs_figsource.Rnw:267-277
+### code chunk number 10: funcs_figsource.Rnw:268-278
 ###################################################
 f.plotgreedygostats <- function( greedyGOtable ) {
     greedyGOtable$issig <- factor( greedyGOtable$issig, c(FALSE, TRUE ) ) 
@@ -294,7 +295,7 @@ f.plotgreedygostats <- function( greedyGOtable ) {
 
 
 ###################################################
-### code chunk number 11: funcs_figsource.Rnw:283-289
+### code chunk number 11: funcs_figsource.Rnw:284-290
 ###################################################
 f.getHighIn <- function( x ) {
     condsinvolved <- matrix( unlist( str_split( x$meta, '\\.')),
@@ -305,7 +306,7 @@ f.getHighIn <- function( x ) {
 
 
 ###################################################
-### code chunk number 12: funcs_figsource.Rnw:295-332
+### code chunk number 12: funcs_figsource.Rnw:296-333
 ###################################################
 f.cross.wGenelist <- function( x, genelist ){
     m.gl <- melt(genelist)
@@ -347,7 +348,7 @@ f.plot_hitlist_genelist <- function(deseqcompared = 'GFP.NEG',genelist,
 
 
 ###################################################
-### code chunk number 13: funcs_figsource.Rnw:337-360
+### code chunk number 13: funcs_figsource.Rnw:338-361
 ###################################################
 require(gtools)
 require(grid)

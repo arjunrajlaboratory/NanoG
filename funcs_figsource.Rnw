@@ -130,6 +130,7 @@ f.greedyGO <- function( gotable, genehits, goorderFUN, gonumcutoff=20){
 	}
     }
     outgo <- cbind(TERM=Term(as.character(outgo$Category)),outgo)
+    outgo <- data.frame(outgo)
     outgo <- outgo[,c('TERM','Num','Num.hits','Num.univ','Category')]
     outgo$Num.hits.rndm <- frac.hits.rndm * outgo$Num.univ
     return( outgo )

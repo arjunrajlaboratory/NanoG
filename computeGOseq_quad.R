@@ -41,6 +41,7 @@ f.calccats_hits <- function(){
 cats_hits_UpNeg_UpDiff <- f.calccats_hits()
 
 save(list='cats_hits_UpNeg_UpDiff',file='./intermediate_results/cats_hits_UpNeg_UpDiff.RData')
+write.csv(cats_hits_UpNeg_UpDiff, './outputdata/figCoh/conventionalGO_UpNeg_UpDiff.csv')
 
 # Down in NEG, DIFF.
 require(GO.db)
@@ -62,7 +63,7 @@ f.calccats_hits <- function(){
 cats_hits_DownNeg_DownDiff <- f.calccats_hits()
 
 save(list='cats_hits_DownNeg_DownDiff',file='./intermediate_results/cats_hits_DownNeg_DownDiff.RData')
-
+write.csv(cats_hits_DownNeg_DownDiff, './outputdata/figCoh/conventionalGO_DownNeg_DownDiff.csv')
 
 
 # Down in NEG, Up in DIFF.
@@ -85,7 +86,7 @@ f.calccats_hits <- function(){
 cats_hits_DownNeg_UpDiff <- f.calccats_hits()
 
 save(list='cats_hits_DownNeg_UpDiff',file='./intermediate_results/cats_hits_DownNeg_UpDiff.RData')
-
+write.csv(cats_hits_DownNeg_UpDiff, './outputdata/figCoh/conventionalGO_DownNeg_UpDiff.csv')
 
 
 
@@ -109,3 +110,4 @@ f.calccats_hits <- function(){
 cats_hits_UpNeg_DownDiff <- f.calccats_hits()
 
 save(list='cats_hits_UpNeg_DownDiff',file='./intermediate_results/cats_hits_UpNeg_DownDiff.RData')
+write.csv(cats_hits_UpNeg_DownDiff, './outputdata/figCoh/conventionalGO_UpNeg_DownDiff.csv')
